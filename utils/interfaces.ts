@@ -1,4 +1,3 @@
-import { JwtPayload } from "jsonwebtoken";
 import { RowDataPacket } from "mysql2";
 
 export interface IAuth extends RowDataPacket {
@@ -32,9 +31,3 @@ export type AuthResponsePayload = {
   message: string | null;
   payload: Profile[] | null;
 };
-
-export type IAuthResponse = {
-  status: number;
-  message: string;
-  payload?: Profile[];
-}
