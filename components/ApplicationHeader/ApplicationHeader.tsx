@@ -18,7 +18,6 @@ const nixie = Nixie_One({
 
 export default function ApplicationHeader() {
   const { loggedIn, authLoaded } = useAuth();
-  console.log(loggedIn, authLoaded);
   const path = usePathname();
   return (
     <header className={styles.applicationHeader}>
