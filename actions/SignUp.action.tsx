@@ -25,7 +25,7 @@ export default async function signUp(
       return {
         ok: false,
         data: {
-          message: "Invalid inputs",
+          message: "Please enter a valid email or password.",
           payload: null,
         },
       };
