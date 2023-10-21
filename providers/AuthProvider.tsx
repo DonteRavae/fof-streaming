@@ -3,7 +3,7 @@
 // REACT
 import { ReactNode, createContext, useEffect, useState } from "react";
 // NEXT.JS
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 // INTERNAL
 import checkAuth from "@/actions/CheckAuth";
 import { Profile } from "@/utils/interfaces";
@@ -59,6 +59,7 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
   });
 
   const router = useRouter();
+  const path = usePathname();
 
   useEffect(() => {
     const verifyAuth = async () => {
@@ -70,7 +71,8 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
       } else {
         logoutUser();
         setAuthLoaded(true);
-        router.replace("/");
+        if (path !== "/") router.replace("/");
+        else router.replace("/access/signin");
       }
     };
 
@@ -79,10 +81,10 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
 
   const loginUser = () => setLoggedIn(true);
   const logoutUser = () => {
-    localStorage.removeItem("pid");
-    setPersistProfile("");
     setLoggedIn(false);
     setCurrentProfile(null);
+    setPersistProfile("");
+    localStorage.removeItem("pid");
   };
   const selectProfile = (profile: Profile) => setCurrentProfile(profile);
   const updateProfileList = (profiles: Profile[]) => setProfiles(profiles);
