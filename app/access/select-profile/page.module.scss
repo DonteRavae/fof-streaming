@@ -1,0 +1,27 @@
+.selectProfilePage {
+  height: calc(100vh - 60px);
+  width: 100vw;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  flex-direction: column;
+  padding-top: 20vh;
+
+  h1 {
+    margin-bottom: 2em;
+  }
+
+  .profileList {
+    display: flex;
+
+    .profileCard {
+      text-align: center;
+      cursor: pointer;
+      transition: 300ms ease all;
+
+      &:hover {
+        transform: scale(1.1);
+      }
+    }
+  }
+}

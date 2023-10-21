@@ -1,0 +1,28 @@
+.signInPage {
+    width: 100%;
+    background: url(../../../assets/signinImg.png) 20% / cover no-repeat fixed;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+}
+
+.overlay {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0, 0, 0, 0.3);
+}
+
+.formContainer {
+    position: relative;
+    form {
+        border-radius: 5px;
+        background: rgba(0, 0, 0, 0.8);
+        z-index: 5;
+        box-shadow: 0 0 3px #dfdfdf;
+        max-width: 30vw;
+    }
+}

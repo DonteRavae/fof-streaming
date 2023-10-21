@@ -1,0 +1,68 @@
+.applicationHeader {
+  height: 60px;
+  width: 100vw;
+  display: flex;
+  align-items: center;
+  color: white;
+  padding: 0 3%;
+  position: sticky;
+  top: 0;
+  background: transparent;
+  z-index: 999;
+
+  nav {
+    animation: fadeInAnimation ease 0.7s;
+    animation-iteration-count: 1;
+    animation-fill-mode: forwards;
+    @keyframes fadeInAnimation {
+      0% {
+        opacity: 0;
+      }
+      100% {
+        opacity: 1;
+      }
+    }
+  }
+
+  a {
+    height: 100%;
+    display: flex;
+    align-items: center;
+
+    h2 {
+      margin: 0;
+    }
+  }
+
+  .applicationNav {
+    height: 60%;
+    width: clamp(500px, 40%, 600px);
+    display: flex;
+    align-items: center;
+    justify-content: space-evenly;
+    font-weight: lighter;
+
+    a {
+      border: none;
+
+      position: relative;
+      font-size: 0.9em;
+
+      &::after {
+        content: "";
+        position: absolute;
+        width: 0px;
+        height: 2px;
+        left: 50%;
+        bottom: 0;
+        background-color: white;
+        transition: all ease-in-out 0.2s;
+      }
+
+      &:hover::after {
+        width: 100%;
+        left: 0;
+      }
+    }
+  }
+}
