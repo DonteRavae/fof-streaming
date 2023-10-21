@@ -2,12 +2,12 @@
 import { useState } from "react";
 // NEXT.JS
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 // INTERNAL
 import useAuth from "@/hooks/useAuth";
+import signOut from "@/actions/SignOut";
 // STYLES
 import styles from "./AccountNavigation.module.scss";
-import signOut from "@/actions/SignOut";
-import { useRouter } from "next/navigation";
 
 export default function AccountNavigation() {
   const router = useRouter();
