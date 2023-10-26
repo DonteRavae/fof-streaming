@@ -3,7 +3,7 @@
 // REACT
 import { ReactNode, createContext, useEffect, useState } from "react";
 // NEXT.JS
-import { usePathname, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 // INTERNAL
 import checkAuth from "@/actions/CheckAuth";
 import { Profile } from "@/utils/interfaces";
@@ -17,7 +17,7 @@ type AuthContextState = {
   currentProfile: Profile | null;
   loginUser(): void;
   logoutUser(): void;
-  selectProfile(profile: Profile): void;
+  selectProfile(profile: Profile | null): void;
   updateProfileList(profiles: Profile[]): void;
   persistUser(value: boolean): void;
   persistUserProfile(id: string): void;
@@ -32,7 +32,7 @@ const INITIAL_CONTEXT: AuthContextState = {
   currentProfile: null,
   loginUser: () => {},
   logoutUser: () => {},
-  selectProfile: (profile: Profile) => {},
+  selectProfile: (profile: Profile | null) => {},
   updateProfileList: (profiles: Profile[]) => {},
   persistUser: (value: boolean) => {},
   persistUserProfile: (id: string) => {},
@@ -59,20 +59,19 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
   });
 
   const router = useRouter();
-  const path = usePathname();
 
   useEffect(() => {
     const verifyAuth = async () => {
       let res = await checkAuth(persistProfile);
       if (res) {
-        setCurrentProfile(res);
+        setCurrentProfile(res[0]);
+        setProfiles(res[1]);
         loginUser();
         setAuthLoaded(true);
       } else {
         logoutUser();
         setAuthLoaded(true);
-        if (path !== "/") router.replace("/");
-        else router.replace("/access/signin");
+        router.replace("/");
       }
     };
 
@@ -86,7 +85,7 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
     setPersistProfile("");
     localStorage.removeItem("pid");
   };
-  const selectProfile = (profile: Profile) => setCurrentProfile(profile);
+  const selectProfile = (profile: Profile | null) => setCurrentProfile(profile);
   const updateProfileList = (profiles: Profile[]) => setProfiles(profiles);
   const persistUser = (value: boolean) => setPersist(value);
   const persistUserProfile = (id: string) => setPersistProfile(id);

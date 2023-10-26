@@ -124,7 +124,7 @@ export async function register_subscriber(
     console.error(error);
     if (conn) await conn?.rollback();
   } finally {
-    if (conn) await conn.release();
+    if (conn) conn.release();
   }
 
   return {
@@ -213,7 +213,7 @@ export async function login_subscriber(
     console.error(error);
     if (conn) await conn.rollback();
   } finally {
-    if (conn) await conn.release();
+    if (conn) conn.release();
   }
   return {
     ok: false,
@@ -249,15 +249,32 @@ export async function logout_subscriber(token: string) {
   }
 }
 
-export async function get_profile_by_id(id: string): Promise<IProfile | null> {
+export async function refresh_profiles_by_id(
+  id: string
+): Promise<[IProfile, IProfile[]] | null> {
+  let conn = null;
+
   try {
-    let [result] = await pool.execute<IProfile[]>(
-      "SELECT id, name FROM profiles WHERE id = ?",
+    conn = await pool.getConnection();
+    await conn.beginTransaction();
+    let [result] = await conn.query<IProfile[]>(
+      "SELECT * FROM profiles WHERE id = ?",
       [id]
     );
-    if (result.length > 0) return result[0];
+    if (result.length > 0) {
+      let currentProfile = result[0];
+      let [profiles] = await conn.query<IProfile[]>(
+        "SELECT id, name FROM profiles WHERE auth_id = ?",
+        [currentProfile.auth_id]
+      );
+      await conn.commit();
+      return [result[0], profiles];
+    }
   } catch (error) {
     console.error(error);
+    if (conn) await conn.rollback();
+  } finally {
+    if (conn) conn.release();
   }
   return null;
 }
@@ -265,10 +282,15 @@ export async function get_profile_by_id(id: string): Promise<IProfile | null> {
 export async function refresh(
   token: string,
   pid: string
-): Promise<IProfile | null> {
+): Promise<[IProfile, IProfile[]] | null> {
+  let conn = null;
+
   try {
-    let [result] = await pool.execute<IAuth[]>(
-      "SELECT ref FROM auth WHERE refresh_token = ?",
+    conn = await pool.getConnection();
+    await conn.beginTransaction();
+
+    let [result] = await conn.query<IAuth[]>(
+      "SELECT id, ref FROM auth WHERE refresh_token = ?",
       [token]
     );
     if (result.length < 1) return null;
@@ -280,12 +302,21 @@ export async function refresh(
     if (user.ref !== claims.sub) return null;
     const tokens = generateJWTs(user.ref);
 
-    let [profiles] = await pool.execute<IProfile[]>(
+    let [profiles] = await conn.query<IProfile[]>(
       "SELECT id, name FROM profiles WHERE id = ?",
       [pid]
     );
 
     if (profiles.length < 1) redirect("/access/signin");
+
+    const currentProfile = profiles[0];
+
+    [profiles] = await conn.query<IProfile[]>(
+      "SELECT * FROM profiles WHERE auth_id = ?",
+      user.id
+    );
+
+    await conn.commit();
 
     cookies().set({
       name: "ffat",
@@ -296,7 +327,7 @@ export async function refresh(
       sameSite: "strict",
     });
 
-    return profiles[0];
+    return [currentProfile, profiles];
   } catch (error) {
     console.log(error);
   }
