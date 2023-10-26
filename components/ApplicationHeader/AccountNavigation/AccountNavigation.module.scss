@@ -12,32 +12,40 @@
     width: 45px;
     border-radius: 50%;
     margin-left: 20px;
-    // border: 1px solid yellow;
   }
 
+  &:hover > .dropdown {
+    animation: dropdownMenu ease 1.5s forwards;
+
+    ul {
+      padding: 0 10px;
+    }
+  }
   .dropdown {
     width: 100%;
+    max-height: 0;
     min-width: 200px;
-    height: 0;
     position: absolute;
     top: 60px;
-    background: rgba(0, 0, 0, 0.3);
     border-radius: 5px;
     z-index: 5;
     overflow: hidden;
-    transition: 500ms ease all;
-    // padding: 0 10px;
 
-    &.showDropdown {
-      height: auto;
-      padding: 0 10px;
+    .navDropdown {
+      width: 100%;
+      background: rgba(0, 0, 0, 1);
     }
 
     li {
-      height: 50px;
+      min-height: 3.5em;
       display: flex;
       align-items: center;
       list-style-type: none;
+
+      a {
+        height: 100%;
+        width: 100%;
+      }
 
       .signOutButton {
         height: 100%;
@@ -45,12 +53,68 @@
         background: none;
         border: none;
         cursor: pointer;
+        color: white;
       }
 
       &:hover {
         text-decoration: underline;
       }
-      // position: relative;
     }
+
+    .manageProfiles {
+      max-height: 3.5em;
+      overflow: hidden;
+      width: 100%;
+      display: block;
+      list-style-type: none;
+
+      span {
+        height: 3.5em;
+        width: 100%;
+        display: flex;
+        align-items: center;
+      }
+
+      .profilesDropdown {
+        width: 100%;
+        border-radius: 5px;
+        padding: 0;
+        display: block;
+        li {
+          display: inline-flex;
+          justify-content: center;
+          a {
+            width: 100%;
+            margin-left: 10px;
+            text-align: center;
+            text-decoration: none !important;
+          }
+        }
+      }
+
+      &:hover {
+        animation: dropdownProfiles ease-in 0.7s 0.3s forwards;
+      }
+    }
+  }
+}
+
+@keyframes dropdownMenu {
+  0% {
+    max-height: 0;
+  }
+
+  100% {
+    max-height: 100vh;
+  }
+}
+
+@keyframes dropdownProfiles {
+  0% {
+    max-height: 3.5em;
+  }
+
+  100% {
+    max-height: 24em;
   }
 }

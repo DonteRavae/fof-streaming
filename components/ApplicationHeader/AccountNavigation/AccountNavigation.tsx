@@ -1,6 +1,5 @@
-// REACT
-import { useState } from "react";
 // NEXT.JS
+import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 // INTERNAL
@@ -8,11 +7,11 @@ import useAuth from "@/hooks/useAuth";
 import signOut from "@/actions/SignOut";
 // STYLES
 import styles from "./AccountNavigation.module.scss";
+import { Icons } from "@/components/Icons";
 
 export default function AccountNavigation() {
   const router = useRouter();
-  const { currentProfile, logoutUser, selectProfile } = useAuth();
-  const [isVisible, setIsVisible] = useState<boolean>(false);
+  const { currentProfile, logoutUser, selectProfile, profiles } = useAuth();
 
   const onSignOut = () => {
     signOut();
@@ -22,11 +21,7 @@ export default function AccountNavigation() {
 
   return (
     currentProfile && (
-      <nav
-        className={styles.accountNav}
-        onMouseEnter={() => setIsVisible(true)}
-        onMouseLeave={() => setIsVisible(false)}
-      >
+      <nav className={styles.accountNav}>
         <p>{currentProfile?.name}</p>
         <Image
           priority
@@ -36,15 +31,32 @@ export default function AccountNavigation() {
           src={`https://api.multiavatar.com/${currentProfile?.id}.svg`}
           alt="User Avatar"
         />
-        <section
-          className={`${styles.dropdown} ${
-            isVisible ? styles.showDropdown : ""
-          }`}
-        >
-          <ul>
-            <li>My Account</li>
-            <li>Profiles</li>
-            <li>Help</li>
+        <section className={styles.dropdown}>
+          <ul className={styles.navDropdown}>
+            <li>
+              <Link href="/account">My Account</Link>
+            </li>
+            <li className={styles.manageProfiles}>
+              <span>Profiles</span>
+              <ul className={styles.profilesDropdown}>
+                {profiles
+                  .filter((p) => p.id !== currentProfile.id)
+                  .map((profile) => (
+                    <li key={profile.id}>{profile.name}</li>
+                  ))}
+                <li>
+                  <Icons type="add-circle" />
+                  <Link href="/profiles/new">Add Profile</Link>
+                </li>
+                <li>
+                  <Icons type="edit-light" />
+                  <Link href="/profiles/edit">Manage Profiles</Link>
+                </li>
+              </ul>
+            </li>
+            <li>
+              <Link href={"/help"}>Help</Link>
+            </li>
             <li>
               <button className={styles.signOutButton} onClick={onSignOut}>
                 Sign Out
