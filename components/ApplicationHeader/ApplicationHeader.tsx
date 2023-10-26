@@ -26,7 +26,7 @@ export default function ApplicationHeader() {
           <Link href={`${loggedIn ? "/catalog" : "/"}`}>
             <h2 className={nixie.className}>Force of Faith</h2>
           </Link>
-          {loggedIn && path !== "/access/select-profile" && (
+          {loggedIn && !path.startsWith("/profiles") && (
             <nav className={styles.applicationNav}>
               <Link href="/catalog/sermons">Sermons</Link>
               <Link href="/catalog/podcasts">Podcasts</Link>
@@ -35,7 +35,7 @@ export default function ApplicationHeader() {
             </nav>
           )}
           {/* ADD SEARCHBAR */}
-          {loggedIn && <AccountNavigation />}
+          {loggedIn && !path.startsWith("/profiles") && <AccountNavigation />}
           {!loggedIn && <AccessNavigation />}
         </>
       )}
