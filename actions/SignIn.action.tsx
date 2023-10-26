@@ -1,9 +1,10 @@
 "use server";
 
+import { AuthResponse } from "@/utils/interfaces";
 // INTERNAL
 import * as db from "../utils/db";
 
-export default async function signIn(formData: FormData) {
+export default async function signIn(formData: FormData): Promise<AuthResponse> {
   let email = formData.get("email");
   let pwd = formData.get("password");
 
@@ -12,5 +13,13 @@ export default async function signIn(formData: FormData) {
     pwd = pwd.toString();
 
     return await db.login_subscriber(email, pwd);
+  }
+
+  return {
+    ok: false,
+    data: {
+      message: "Please enter valid inputs.",
+      payload: null
+    }
   }
 }

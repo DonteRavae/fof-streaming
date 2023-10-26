@@ -63,7 +63,7 @@ export default function SignInForm() {
       const profiles = res.data.payload as Profile[];
       loginUser();
       updateProfileList(profiles);
-      redirect("/access/select-profile");
+      redirect("/profiles/select");
     }
 
     setErrMsg(res.data.message as string);
@@ -130,16 +130,16 @@ export default function SignInForm() {
       />
 
       <footer>
-        <Link className={styles.forgotPassword} href="/access/forgot-password">
+        <Link className={styles.forgotPassword} href="/help/forgot-password">
           Forgot Password?
         </Link>
         <p>
           By logging in, you agree to Mt. Zion World Outreach{" "}
-          <Link className={styles.terms} href="/privacypolicy">
+          <Link className={styles.terms} href="/legal/privacy">
             Privacy Policy
           </Link>{" "}
           and{" "}
-          <Link className={styles.terms} href="/termsofuse">
+          <Link className={styles.terms} href="/legal/terms">
             Terms of Use
           </Link>
           .
