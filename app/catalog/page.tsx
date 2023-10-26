@@ -1,8 +1,9 @@
-// NEXT.JS
-import { redirect } from "next/navigation";
-// INTERNAL
-// import getUser from "@/actions/GetUser.action";
+import Showcase from "@/components/Showcase/Showcase";
 
 export default function CatalogOverviewPage() {
-  return <main>Catalog Overview Page</main>;
+  return (
+    <main>
+      <Showcase />
+    </main>
+  );
 }

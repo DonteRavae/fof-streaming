@@ -1,0 +1,49 @@
+.showcaseContainer {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    position: relative;
+
+
+    .showcaseScroller {
+        height: auto;
+        width: 100%;
+        position: relative;
+        overflow: hidden;
+        overflow-x: auto;
+        white-space: nowrap;
+        scrollbar-width: none;
+        display: inline-block;
+        scrollbar-width: none;
+        scroll-behavior: smooth;
+        padding: 50px 2vw;
+
+        &::-webkit-scrollbar {
+            display: none;
+        }
+
+    }
+
+    .sliderNav {
+        height: 2.5vh;
+        position: absolute;
+        bottom: 60px;
+        right: 6vw;
+        z-index: 5;
+
+        .sliderNavDots {
+            height: 10px;
+            width: 10px;
+            margin: 0 5px;
+            background: rgba(255, 255, 255, 0.5);
+            border-radius: 50%;
+            display: inline-block;
+
+            cursor: pointer;
+
+            &.currentlyPlaying {
+                background: white;
+            }
+        }
+    }
+}
