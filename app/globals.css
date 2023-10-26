@@ -86,7 +86,6 @@ body {
 
 body {
   color: rgb(var(--foreground-rgb));
-  /* background: rgb(59, 0, 59); */
   background: url(../assets/bkg.png) 75%/cover no-repeat fixed;
 }
 
