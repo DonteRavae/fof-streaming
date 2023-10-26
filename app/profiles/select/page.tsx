@@ -10,6 +10,7 @@ import useAuth from "@/hooks/useAuth";
 import { Profile } from "@/utils/interfaces";
 // STYLES
 import styles from "./page.module.scss";
+import { Icons } from "@/components/Icons";
 
 export default function SelectProfilePage() {
   const router = useRouter();
@@ -39,25 +40,33 @@ export default function SelectProfilePage() {
     !currentProfile && (
       <main className={styles.selectProfilePage}>
         <h1>{"Who's Watching?"}</h1>
-        <div className={styles.profileList}>
+        <ul className={styles.profileList}>
           {profiles.map((profile) => (
-            <div
+            <li
               key={profile.id}
               className={styles.profileCard}
               onClick={() => handleProfileSelection(profile)}
             >
-              <Image
-                priority
-                width={100}
-                height={100}
-                className={styles.profilePic}
-                src={`https://api.multiavatar.com/${profile.id}.svg`}
-                alt="User Avatar"
-              />
-              <h4>{profile.name}</h4>
-            </div>
+              <div className={styles.profilePicWrapper}>
+                <Image
+                  priority
+                  width={150}
+                  height={150}
+                  className={styles.profilePic}
+                  src={`https://api.multiavatar.com/${profile.id}.svg`}
+                  alt="User Avatar"
+                />
+              </div>
+              <h3>{profile.name}</h3>
+            </li>
           ))}
-        </div>
+          <li className={styles.profileCard}>
+            <div className={`${styles.profilePicWrapper} ${styles.addProfile}`}>
+              <Icons type="add" />
+            </div>
+            <h3>Add Profile</h3>
+          </li>
+        </ul>
       </main>
     )
   );

@@ -1,0 +1,99 @@
+.editProfilesPage {
+  height: calc(100vh - 60px);
+  width: 100vw;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  flex-direction: column;
+  padding-top: 20vh;
+  color: white;
+
+  h1 {
+    margin-bottom: 2em;
+    font-size: 2.5em;
+  }
+
+  .profileList {
+    min-width: 500px;
+    display: flex;
+    justify-content: space-evenly;
+    list-style-type: none;
+
+    .profileCard {
+      text-align: center;
+      cursor: pointer;
+
+      .profilePicWrapper {
+        position: relative;
+        overflow: hidden;
+        border-radius: 50%;
+        transition: 300ms ease all;
+        display: flex;
+        align-items: flex-end;
+        justify-content: center;
+        border: 2px solid white;
+
+        .profilePic {
+          transform: scale(1.1);
+        }
+
+        .editIcon {
+          height: 50px;
+          width: 85px;
+          position: absolute;
+          bottom: -25px;
+          background: rgba(255, 255, 255, 0.7);
+          background: rgba(0, 0, 0, 0.8);
+          color: black;
+          display: flex;
+          align-items: flex-start;
+          justify-content: center;
+          border-radius: 50%;
+        }
+
+        &.addProfile {
+          height: 155px;
+          width: 155px;
+          background: rgba(255, 255, 255, 0.4);
+
+          svg {
+            height: 75px;
+            width: 75px;
+            margin: auto;
+            fill: rgb(59, 0, 59);
+          }
+
+          &:hover {
+            background: rgba(255, 255, 255, 0.7);
+          }
+        }
+
+        &:hover {
+          border: 2px solid white;
+          transform: scale(1.05);
+        }
+      }
+
+      h3 {
+        margin-top: 20px;
+      }
+    }
+  }
+}
+
+.finishEditButton {
+  position: absolute;
+  top: 15px;
+  right: 3%;
+  height: 40px;
+  padding: 0 25px;
+  cursor: pointer;
+  z-index: 1000;
+  background: rgb(97, 154, 50);
+  border-radius: 5px;
+  border: none;
+
+  &:hover {
+    background: rgb(62, 116, 18); // Third tinted
+  }
+}
