@@ -13,6 +13,7 @@ export const metadata: Metadata = {
   title: "Force of Faith",
   description:
     "Stream content from your favorite churches in one centralized location for a low price.",
+  robots: "index, follow",
 };
 
 export default function RootLayout({
