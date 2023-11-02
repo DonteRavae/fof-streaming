@@ -32,7 +32,7 @@ export default function AccountNavigation() {
           alt="User Avatar"
         />
         <section className={styles.dropdown}>
-          <ul className={styles.navDropdown}>
+          <menu className={styles.navDropdown}>
             <li>
               <Link href="/account">My Account</Link>
             </li>
@@ -57,12 +57,12 @@ export default function AccountNavigation() {
             <li>
               <Link href={"/help"}>Help</Link>
             </li>
-            <li>
+            <li className={styles.signOutButtonContainer}>
               <button className={styles.signOutButton} onClick={onSignOut}>
                 Sign Out
               </button>
             </li>
-          </ul>
+          </menu>
         </section>
       </nav>
     )

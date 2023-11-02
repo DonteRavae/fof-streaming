@@ -1,5 +1,7 @@
 "use client";
 
+// REACT
+import { useEffect, useState } from "react";
 // NEXT.JS
 import Link from "next/link";
 import { Nixie_One } from "next/font/google";
@@ -18,9 +20,24 @@ const nixie = Nixie_One({
 
 export default function ApplicationHeader() {
   const { loggedIn, authLoaded } = useAuth();
+  const [sticky, setSticky] = useState<boolean>(false);
   const path = usePathname();
+
+  useEffect(() => {
+    window.addEventListener("scroll", scrollListener);
+
+    return () => window.removeEventListener("scroll", scrollListener);
+  }, []);
+
+  const scrollListener = () => {
+    if (scrollY > 60) setSticky(true);
+    else setSticky(false);
+  };
+
   return (
-    <header className={styles.applicationHeader}>
+    <header
+      className={`${styles.applicationHeader} ${sticky ? styles.sticky : ""}`}
+    >
       {authLoaded && (
         <>
           <Link href={`${loggedIn ? "/catalog" : "/"}`}>
@@ -28,10 +45,20 @@ export default function ApplicationHeader() {
           </Link>
           {loggedIn && !path.startsWith("/profiles") && (
             <nav className={styles.applicationNav}>
-              <Link href="/catalog/sermons">Sermons</Link>
-              <Link href="/catalog/podcasts">Podcasts</Link>
-              <Link href="/catalog/testimonials">Testimonials</Link>
-              <Link href="/watchlist">My List</Link>
+              <menu>
+                <li>
+                  <Link href="/catalog/sermons">Sermons</Link>
+                </li>
+                <li>
+                  <Link href="/catalog/podcasts">Podcasts</Link>
+                </li>
+                <li>
+                  <Link href="/catalog/testimonials">Testimonials</Link>
+                </li>
+                <li>
+                  <Link href="/watchlist">My List</Link>
+                </li>
+              </menu>
             </nav>
           )}
           {/* ADD SEARCHBAR */}

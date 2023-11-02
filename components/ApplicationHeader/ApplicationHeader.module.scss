@@ -9,15 +9,24 @@
   top: 0;
   background: transparent;
   z-index: 999;
+  transition: 500ms ease all;
+
+  &.sticky {
+    background: rgba(0, 0, 0, 0.9);
+    background: rgba(59, 0, 59, 1);
+    box-shadow: 0 1px 3px rgba(255, 255, 255, 0.3);
+  }
 
   nav {
     animation: fadeInAnimation ease 0.7s;
     animation-iteration-count: 1;
     animation-fill-mode: forwards;
+
     @keyframes fadeInAnimation {
       0% {
         opacity: 0;
       }
+
       100% {
         opacity: 1;
       }
@@ -41,6 +50,14 @@
     align-items: center;
     justify-content: space-evenly;
     font-weight: lighter;
+
+
+    menu {
+      width: 100%;
+      list-style-type: none;
+      display: flex;
+      justify-content: space-evenly;
+    }
 
     a {
       border: none;
