@@ -3,7 +3,7 @@
 // REACT
 import { use, useEffect, useRef, useState } from "react";
 // INTERNAL
-import ShowcaseVideoCard from "./ShowcaseVideoCard/ShowcaseVideoCard";
+import VideoCard from "../VideoCard/VideoCard";
 // STYLES
 import styles from "./Showcase.module.scss";
 
@@ -92,9 +92,9 @@ export default function Showcase() {
 
   return (
     <section className={styles.showcaseContainer}>
-      <div className={styles.showcaseScroller} ref={scrollerRef}>
+      <div className={styles.showcaseSlider} ref={scrollerRef}>
         {showcaseVideos.map((vid) => (
-          <ShowcaseVideoCard key={vid.id} source={vid.url} />
+          <VideoCard key={vid.id} source={vid.url} />
         ))}
       </div>
       <ul className={styles.sliderNav}>

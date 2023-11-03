@@ -6,17 +6,30 @@
     margin-bottom: 25px;
 
 
-    .showcaseScroller {
+    .showcaseSlider {
         width: 100%;
-        position: relative;
-        overflow: hidden;
-        overflow-x: auto;
-        white-space: nowrap;
-        scrollbar-width: none;
-        display: inline-block;
-        scrollbar-width: none;
+        display: grid;
+        grid-auto-columns: 100%;
+        grid-template-columns: repeat(auto-fill, 1fr);
+        grid-template-rows: minmax(700px, 70vh);
+        grid-auto-flow: column;
+        gap: 50px;
         scroll-behavior: smooth;
+        scrollbar-width: none;
+        overflow-x: auto;
         padding: 25px;
+
+        article {
+            border-radius: 10px;
+            box-shadow: 0 5px 10px 7px rgba(0, 0, 0, 0.3);
+            border: none;
+            overflow: hidden;
+
+            &:hover {
+                box-shadow: 0 5px 10px 3px rgba(255, 255, 255, 0.3);
+                transform: scale(1);
+            }
+        }
 
         &::-webkit-scrollbar {
             display: none;
@@ -25,10 +38,9 @@
     }
 
     .sliderNav {
-        height: 1vh;
         position: absolute;
-        bottom: 60px;
-        right: 4vw;
+        bottom: 50px;
+        left: 4vw;
         z-index: 5;
 
         .sliderNavDots {
