@@ -61,9 +61,9 @@
 
     a {
       border: none;
-
       position: relative;
       font-size: 0.9em;
+      padding: 5px;
 
       &::after {
         content: "";
