@@ -11,18 +11,15 @@ export default function SectionalVideoCardSlider({
 }: SectionalVideoCardSliderProps) {
   return (
     <section className={styles.sectionalContainer}>
-      <h2 className={styles.label}>{label}</h2>
+      <h3 className={styles.label}>{label}</h3>
       <div className={styles.slider}>
-        <VideoCard source="" />
-        <VideoCard source="" />
-        <VideoCard source="" />
-        <VideoCard source="" />
-        <VideoCard source="" />
-        <VideoCard source="" />
-        <VideoCard source="" />
-        <VideoCard source="" />
-        <VideoCard source="" />
-        <VideoCard source="" />
+        <VideoCard source="/ShowcaseTestVideo.mp4" />
+        <VideoCard source="/ShowcaseTestVideo2.m4v" />
+        <VideoCard source="/ShowcaseTestVideo.mp4" />
+        <VideoCard source="/ShowcaseTestVideo2.m4v" />
+        <VideoCard source="/ShowcaseTestVideo.mp4" />
+        <VideoCard source="/ShowcaseTestVideo2.m4v" />
+        <VideoCard source="/ShowcaseTestVideo.mp4" />
       </div>
     </section>
   );

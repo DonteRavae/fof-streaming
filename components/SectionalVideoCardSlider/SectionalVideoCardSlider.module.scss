@@ -1,23 +1,26 @@
 .sectionalContainer {
-    height: 300px;
     width: 100%;
 
     .label {
-        padding: 25px;
+        padding: 0 25px;
     }
 
     .slider {
         width: 100%;
         height: 100%;
         display: grid;
-        grid-auto-columns: 350px;
-        grid-template-columns: repeat(auto-fill, 1fr);
-        grid-template-rows: 200px;
+        grid-auto-columns: 20%;
+        grid-auto-rows: 100%;
         grid-auto-flow: column;
-        padding: 5px 25px;
+        padding: 15px 25px;
         gap: 25px;
-        overflow-x: scroll;
+        overflow-x: auto;
         scrollbar-width: none;
+
         scroll-behavior: smooth;
+
+        &::-webkit-scrollbar {
+            display: none;
+        }
     }
 }
