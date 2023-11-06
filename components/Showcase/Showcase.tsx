@@ -94,7 +94,7 @@ export default function Showcase() {
     <section className={styles.showcaseContainer}>
       <div className={styles.showcaseSlider} ref={scrollerRef}>
         {showcaseVideos.map((vid) => (
-          <VideoCard key={vid.id} source={vid.url} />
+          <VideoCard key={vid.id} source={vid.url} showcase={currentlyPlaying.id === vid.id} />
         ))}
       </div>
       <ul className={styles.sliderNav}>
