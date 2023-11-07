@@ -1,13 +1,19 @@
 "use client";
 
 // REACT
-import { useEffect, useRef, useState } from "react";
+import { Ref, forwardRef, useImperativeHandle, useRef, useState } from "react";
 // NEXT.JS
 import Image from "next/image";
 // INTERNAL
 import test_poster from "@/assets/video_poster.jpg";
 // STYLES
 import styles from "./VideoCard.module.scss";
+import { Icons } from "../Icons";
+
+export type VideoRef = {
+  play: () => void;
+  reset: () => void;
+};
 
 type VideoCardProps = {
   source: string;
@@ -15,30 +21,50 @@ type VideoCardProps = {
   showcaseVideoLength?: number;
 };
 
-export default function VideoCard({
-  source,
-  showcase,
-  showcaseVideoLength,
-}: VideoCardProps) {
+export default forwardRef<VideoRef, VideoCardProps>(function VideoCard(
+  { source, showcase, showcaseVideoLength }: VideoCardProps,
+  ref
+) {
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const [reveal, setReveal] = useState<boolean>(false);
+
   const [showcaseReveal, revealShowcase] = useState<boolean>(false);
+  const [mute, toggleMute] = useState<boolean>(true);
 
-  useEffect(() => {
-    let showcaseTimeout: NodeJS.Timeout | undefined;
-    if (showcase && videoRef && videoRef.current) {
-      showcaseTimeout = setTimeout(() => {
+  useImperativeHandle(ref, () => ({
+    play: () => {
+      if (videoRef && videoRef.current) {
+        videoRef.current.currentTime = 0;
+        videoRef.current.play();
         revealShowcase(true);
-        videoRef.current?.play();
-      }, 2000);
-      videoRef.current.currentTime = 0;
-    }
+      }
+    },
+    reset: () => {
+      if (videoRef && videoRef.current) {
+        revealShowcase(false);
+        videoRef.current.pause();
+        videoRef.current.currentTime = 0;
+        videoRef.current.muted = true;
+        toggleMute(true);
+      }
+    },
+  }));
 
-    revealShowcase(false);
-    return () => {
-      showcaseTimeout && clearTimeout(showcaseTimeout);
-    };
-  }, [showcase, showcaseVideoLength]);
+  // useEffect(() => {
+  //   let showcaseTimeout: NodeJS.Timeout | undefined;
+  //   if (showcase && videoRef && videoRef.current) {
+  //     showcaseTimeout = setTimeout(() => {
+  //       revealShowcase(true);
+  //       videoRef.current?.play();
+  //     }, 2000);
+  //     videoRef.current.currentTime = 0;
+  //   }
+
+  //   revealShowcase(false);
+  //   return () => {
+  //     showcaseTimeout && clearTimeout(showcaseTimeout);
+  //   };
+  // }, [showcase, showcaseVideoLength]);
 
   const playPreview = () => {
     if (!showcase && videoRef && videoRef.current) {
@@ -52,7 +78,20 @@ export default function VideoCard({
     }
   };
 
-  const stopPreview = () => (!showcase ? setReveal(false) : null);
+  const stopPreview = () => {
+    if (!showcase && videoRef && videoRef.current) {
+      setReveal(false);
+      videoRef.current.pause();
+      videoRef.current.currentTime = 0;
+    }
+  };
+
+  const toggleVolume = () => {
+    toggleMute((prev) => !prev);
+    if (videoRef && videoRef.current) {
+      videoRef.current.muted = !mute;
+    }
+  };
 
   return (
     <article
@@ -60,10 +99,13 @@ export default function VideoCard({
         showcaseReveal ? styles.revealShowcaseVideo : ""
       }`}
       onMouseEnter={playPreview}
-      onMouseOut={stopPreview}
+      onMouseLeave={stopPreview}
     >
       <video ref={videoRef} muted src={source}></video>
+      <button className={styles.volumeToggle} onClick={toggleVolume}>
+        <Icons type={mute ? "volume-muted" : "volume-up"} />
+      </button>
       <Image src={test_poster} alt="" fill className={`${styles.poster}`} />
     </article>
   );
-}
+});

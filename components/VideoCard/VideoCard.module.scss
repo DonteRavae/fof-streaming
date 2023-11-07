@@ -16,13 +16,42 @@
 
     .poster {
         position: absolute;
+        visibility: visible;
         transition: 300ms 500ms ease all;
+        z-index: 5;
+        opacity: 1;
+    }
 
+    .volumeToggle {
+        height: 3em;
+        width: 3em;
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        position: absolute;
+        padding-top: 3px;
+        z-index: 3;
+        bottom: 3%;
+        background: none;
+        right: 2%;
+        border-radius: 50%;
+        cursor: pointer;
+        transition: 100ms ease all;
+
+
+        &:hover {
+            border: 2px solid white;
+            box-shadow: 0 0 5px 3px rgba(255, 255, 255, 0.3);
+
+            &~.poster {
+                opacity: 0;
+                visibility: hidden;
+            }
+        }
     }
 
     &.revealShowcaseVideo>.poster {
-        transition: 300ms 2s ease all;
+        transition: 300ms 1s ease all;
         opacity: 0;
+        visibility: hidden;
     }
 
     &.revealVideo {
@@ -31,6 +60,7 @@
 
         .poster {
             opacity: 0;
+            visibility: hidden;
         }
     }
 }
