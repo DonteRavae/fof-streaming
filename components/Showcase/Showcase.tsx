@@ -3,9 +3,11 @@
 // REACT
 import { use, useEffect, useRef, useState } from "react";
 // INTERNAL
-import VideoCard from "../VideoCard/VideoCard";
+import VideoCard, { VideoRef } from "../VideoCard/VideoCard";
 // STYLES
 import styles from "./Showcase.module.scss";
+
+const SHOWCASE_PREVIEW_LENGTH = 10000;
 
 type ShowcaseVideo = {
   id: number;
@@ -37,16 +39,19 @@ const showcaseVideos: ShowcaseVideo[] = [
 
 export default function Showcase() {
   const scrollerRef = useRef<HTMLDivElement | null>(null);
+  const videoRef = useRef<VideoRef | null>(null);
   const [currentlyPlaying, setCurrentlyPlaying] = useState<ShowcaseVideo>(
     showcaseVideos[0]
   );
 
+  // On page reload, set slider to first video card
   useEffect(() => {
     if (scrollerRef && scrollerRef.current) {
       scrollerRef.current.scroll(0, 0);
     }
   }, []);
 
+  // Advance slider every 10 seconds to next video card
   useEffect(() => {
     const autoScrollShowcase = setInterval(() => {
       let currentVideoIndex = showcaseVideos.findIndex(
@@ -54,10 +59,12 @@ export default function Showcase() {
       );
 
       if (scrollerRef && scrollerRef.current) {
+        // If last video in slider, rotate back to beginning
         if (currentVideoIndex === showcaseVideos.length - 1) {
           scrollerRef.current.scroll(0, 0);
           setCurrentlyPlaying(showcaseVideos[0]);
         } else {
+          // Advance to next video
           let elDimensions = scrollerRef.current.getBoundingClientRect();
           let videoCardWidth = elDimensions.right - elDimensions.left;
           scrollerRef.current.scroll(
@@ -67,9 +74,21 @@ export default function Showcase() {
           setCurrentlyPlaying(showcaseVideos[currentVideoIndex + 1]);
         }
       }
-    }, 10000);
+    }, SHOWCASE_PREVIEW_LENGTH);
 
     return () => clearInterval(autoScrollShowcase);
+  }, [currentlyPlaying]);
+
+  useEffect(() => {
+    if (videoRef && videoRef.current) {
+      setTimeout(() => {
+        videoRef?.current?.play();
+      }, 1000);
+
+      setTimeout(() => {
+        videoRef?.current?.reset();
+      }, SHOWCASE_PREVIEW_LENGTH);
+    }
   }, [currentlyPlaying]);
 
   // HANDLERS
@@ -94,7 +113,12 @@ export default function Showcase() {
     <section className={styles.showcaseContainer}>
       <div className={styles.showcaseSlider} ref={scrollerRef}>
         {showcaseVideos.map((vid) => (
-          <VideoCard key={vid.id} source={vid.url} showcase={currentlyPlaying.id === vid.id} />
+          <VideoCard
+            key={vid.id}
+            source={vid.url}
+            showcase={currentlyPlaying.id === vid.id}
+            ref={currentlyPlaying.id === vid.id ? videoRef : null}
+          />
         ))}
       </div>
       <ul className={styles.sliderNav}>
