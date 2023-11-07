@@ -63,7 +63,7 @@ export default function ApplicationHeader() {
           )}
           {/* ADD SEARCHBAR */}
           {loggedIn && !path.startsWith("/profiles") && <AccountNavigation />}
-          {!loggedIn && <AccessNavigation />}
+          {!loggedIn && path !== "/access/signin" && <AccessNavigation />}
         </>
       )}
     </header>
