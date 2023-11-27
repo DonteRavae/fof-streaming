@@ -38,11 +38,11 @@ export default function ApplicationHeader() {
     <header
       className={`${styles.applicationHeader} ${sticky ? styles.sticky : ""}`}
     >
+      <Link href={`${loggedIn ? "/catalog" : "/"}`}>
+        <h2 className={nixie.className}>Force of Faith</h2>
+      </Link>
       {authLoaded && (
         <>
-          <Link href={`${loggedIn ? "/catalog" : "/"}`}>
-            <h2 className={nixie.className}>Force of Faith</h2>
-          </Link>
           {loggedIn && !path.startsWith("/profiles") && (
             <nav className={styles.applicationNav}>
               <menu>
@@ -63,7 +63,10 @@ export default function ApplicationHeader() {
           )}
           {/* ADD SEARCHBAR */}
           {loggedIn && !path.startsWith("/profiles") && <AccountNavigation />}
-          {!loggedIn && path !== "/access/signin" && <AccessNavigation />}
+          {!loggedIn &&
+            path !== "/access/signin" &&
+            path !== "/access/signup/checkout" &&
+            !path.startsWith("/catalog") && <AccessNavigation />}
         </>
       )}
     </header>
