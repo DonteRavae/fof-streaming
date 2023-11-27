@@ -2,7 +2,6 @@
 
 // NEXT.JS
 import { cookies } from "next/headers";
-import { redirect } from "next/navigation";
 
 // INTERNAL
 import * as db from "../utils/db";
