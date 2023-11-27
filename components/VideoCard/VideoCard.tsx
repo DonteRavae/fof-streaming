@@ -1,14 +1,14 @@
 "use client";
 
 // REACT
-import { Ref, forwardRef, useImperativeHandle, useRef, useState } from "react";
+import { forwardRef, useImperativeHandle, useRef, useState } from "react";
 // NEXT.JS
 import Image from "next/image";
 // INTERNAL
+import { Icons } from "../Icons";
 import test_poster from "@/assets/video_poster.jpg";
 // STYLES
 import styles from "./VideoCard.module.scss";
-import { Icons } from "../Icons";
 
 export type VideoRef = {
   play: () => void;
@@ -49,22 +49,6 @@ export default forwardRef<VideoRef, VideoCardProps>(function VideoCard(
       }
     },
   }));
-
-  // useEffect(() => {
-  //   let showcaseTimeout: NodeJS.Timeout | undefined;
-  //   if (showcase && videoRef && videoRef.current) {
-  //     showcaseTimeout = setTimeout(() => {
-  //       revealShowcase(true);
-  //       videoRef.current?.play();
-  //     }, 2000);
-  //     videoRef.current.currentTime = 0;
-  //   }
-
-  //   revealShowcase(false);
-  //   return () => {
-  //     showcaseTimeout && clearTimeout(showcaseTimeout);
-  //   };
-  // }, [showcase, showcaseVideoLength]);
 
   const playPreview = () => {
     if (!showcase && videoRef && videoRef.current) {
