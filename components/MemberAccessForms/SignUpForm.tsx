@@ -15,7 +15,6 @@ import { useRouter } from "next/navigation";
 import useAuth from "@/hooks/useAuth";
 import { Icons } from "../Icons/index";
 import signUp from "@/actions/SignUp.action";
-import { Profile } from "@/utils/interfaces";
 import FormInput from "../FormInput/FormInput";
 import SubmitButton from "../SubmitButton/SubmitButton";
 import { EMAIL_VALIDATION, PWD_VALIDATION } from "@/utils/constants";
@@ -43,11 +42,10 @@ export default function SignUpForm() {
 
   const {
     loginUser,
-    updateProfileList,
     selectProfile,
     persist,
     persistUser,
-    persistProfile,
+    persistedProfile,
     persistUserProfile,
   } = useAuth();
 
@@ -59,8 +57,8 @@ export default function SignUpForm() {
   // Update persisted values in localstorage
   useEffect(() => {
     localStorage.setItem("persist", JSON.stringify(persist));
-    localStorage.setItem("pid", JSON.stringify(persistProfile));
-  }, [persist, persistProfile]);
+    localStorage.setItem("pid", JSON.stringify(persistedProfile));
+  }, [persist, persistedProfile]);
 
   // Check email validity on input change
   useEffect(() => {
@@ -115,12 +113,13 @@ export default function SignUpForm() {
   const onSignUp = async (formData: FormData) => {
     const res = await signUp(formData);
     if (res.ok) {
-      let profiles = res.data.payload as Profile[];
-      loginUser();
-      updateProfileList(profiles);
-      selectProfile(profiles[0]);
-      persistUserProfile(profiles[0].id);
-      router.replace("/catalog");
+      let user = res.data.payload!;
+      const defaultProfile = user.profiles[0].id;
+      console.log(defaultProfile);
+      loginUser(user);
+      selectProfile(user.profiles[0]);
+      persist && persistUserProfile(defaultProfile);
+      router.replace("/access/signup/checkout");
     }
     setErrMsg(res.data.message as string);
   };

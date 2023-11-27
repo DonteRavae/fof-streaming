@@ -18,37 +18,38 @@ const nixie = Nixie_One({
 
 export default function LandingPage() {
   const router = useRouter();
-  const { currentProfile, authLoaded } = useAuth();
+  const { loggedIn, authLoaded, currentProfile } = useAuth();
 
-  if (currentProfile) router.replace("/catalog");
-
-  return authLoaded && !currentProfile ? (
-    <main className={styles.main}>
-      <section className={styles.hero}>
-        <div className={styles.overlay} />
-        <div className={styles.cta}>
-          <h2 className={nixie.className}>
-            Your favorite podcasts, preachers, and teachers. All in one place.{" "}
-            <br /> Step out on faith.
-          </h2>
-          <p className={nixie.className}>
-            Try now for $4.99/month. Cancel anytime.
-          </p>
-          <Link className={styles.signUpBtn} href="access/signup">
-            Sign Up Now
-          </Link>
-        </div>
-      </section>
-    </main>
-  ) : (
-    <main className={styles.loadingContainer}>
-      <SpinnerCircularFixed
-        size={50}
-        thickness={100}
-        speed={180}
-        color="#FFFFFF"
-        secondaryColor="rgba(0, 0, 0, 0.44)"
-      />
-    </main>
-  );
+  if (authLoaded && loggedIn && !currentProfile)
+    router.replace("/profiles/select");
+  else
+    return authLoaded && !loggedIn ? (
+      <main className={styles.main}>
+        <section className={styles.hero}>
+          <div className={styles.overlay} />
+          <div className={styles.cta}>
+            <h2 className={nixie.className}>
+              Your favorite podcasts, preachers, and teachers.
+              <br /> All in one place.
+            </h2>
+            <p className={nixie.className}>
+              Try now for $4.99/month. Cancel anytime.
+            </p>
+            <Link className={styles.signUpBtn} href="access/signup">
+              Sign Up Now
+            </Link>
+          </div>
+        </section>
+      </main>
+    ) : (
+      <main className={styles.loadingContainer}>
+        <SpinnerCircularFixed
+          size={50}
+          thickness={100}
+          speed={180}
+          color="#FFFFFF"
+          secondaryColor="rgba(0, 0, 0, 0.44)"
+        />
+      </main>
+    );
 }

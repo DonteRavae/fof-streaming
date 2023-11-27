@@ -7,25 +7,25 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 // INTERNAL
 import useAuth from "@/hooks/useAuth";
+import { Icons } from "@/components/Icons";
 import { Profile } from "@/utils/interfaces";
 // STYLES
 import styles from "./page.module.scss";
-import { Icons } from "@/components/Icons";
 
 export default function EditProfilesPage() {
   const router = useRouter();
   const {
+    user,
     authLoaded,
-    profiles,
     loggedIn,
-    persistProfile,
+    persistedProfile,
     selectProfile,
     persistUserProfile,
   } = useAuth();
 
   useEffect(() => {
-    localStorage.setItem("pid", JSON.stringify(persistProfile));
-  }, [persistProfile]);
+    localStorage.setItem("pid", JSON.stringify(persistedProfile));
+  }, [persistedProfile]);
 
   const handleProfileSelection = (profile: Profile) => {
     selectProfile(profile);
@@ -44,13 +44,13 @@ export default function EditProfilesPage() {
       <main className={styles.editProfilesPage}>
         <h1>{"Manage Profiles"}</h1>
         <ul className={styles.profileList}>
-          {profiles.map((profile) => (
+          {user?.profiles.map((profile) => (
             <li
               key={profile.id}
               className={styles.profileCard}
               onClick={() => handleProfileSelection(profile)}
             >
-              <div className={styles.profilePicWrapper}>
+              <button className={styles.profilePicWrapper}>
                 <Image
                   priority
                   width={150}
@@ -62,15 +62,17 @@ export default function EditProfilesPage() {
                 <div className={styles.editIcon}>
                   <Icons type="edit-light" />
                 </div>
-              </div>
+              </button>
               <h3>{profile.name}</h3>
             </li>
           ))}
 
           <li className={styles.profileCard}>
-            <div className={`${styles.profilePicWrapper} ${styles.addProfile}`}>
+            <button
+              className={`${styles.profilePicWrapper} ${styles.addProfile}`}
+            >
               <Icons type="add" />
-            </div>
+            </button>
             <h3>Add Profile</h3>
           </li>
         </ul>

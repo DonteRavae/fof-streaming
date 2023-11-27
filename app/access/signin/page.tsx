@@ -10,13 +10,13 @@ import styles from "./page.module.scss";
 
 export default function SignInPage() {
   const router = useRouter();
-  const { currentProfile, authLoaded } = useAuth();
+  const { loggedIn, authLoaded } = useAuth();
 
-  if (currentProfile) router.replace("/catalog");
+  if (loggedIn) router.replace("/profiles/select");
 
   return (
     authLoaded &&
-    !currentProfile && (
+    !loggedIn && (
       <main className={styles.signInPage}>
         <div className={styles.overlay} />
         <div className={styles.formContainer}>

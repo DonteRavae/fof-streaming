@@ -5,13 +5,13 @@ import { useRouter } from "next/navigation";
 // INTERNAL
 import useAuth from "@/hooks/useAuth";
 import signOut from "@/actions/SignOut";
+import { Icons } from "@/components/Icons";
 // STYLES
 import styles from "./AccountNavigation.module.scss";
-import { Icons } from "@/components/Icons";
 
 export default function AccountNavigation() {
   const router = useRouter();
-  const { currentProfile, logoutUser, selectProfile, profiles } = useAuth();
+  const { currentProfile, logoutUser, user } = useAuth();
 
   const onSignOut = () => {
     signOut();
@@ -39,7 +39,7 @@ export default function AccountNavigation() {
             <li className={styles.manageProfiles}>
               <span>Profiles</span>
               <ul className={styles.profilesDropdown}>
-                {profiles
+                {user?.profiles
                   .filter((p) => p.id !== currentProfile.id)
                   .map((profile) => (
                     <li key={profile.id}>{profile.name}</li>

@@ -7,27 +7,19 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 // INTERNAL
 import useAuth from "@/hooks/useAuth";
+import { Icons } from "@/components/Icons";
 import { Profile } from "@/utils/interfaces";
 // STYLES
 import styles from "./page.module.scss";
-import { Icons } from "@/components/Icons";
 
 export default function SelectProfilePage() {
   const router = useRouter();
   const {
+    user,
     authLoaded,
-    profiles,
-    currentProfile,
-    persistProfile,
     selectProfile,
     persistUserProfile,
   } = useAuth();
-
-  if (currentProfile) router.replace("/catalog");
-
-  useEffect(() => {
-    localStorage.setItem("pid", JSON.stringify(persistProfile));
-  }, [persistProfile]);
 
   const handleProfileSelection = (profile: Profile) => {
     selectProfile(profile);
@@ -36,18 +28,17 @@ export default function SelectProfilePage() {
   };
 
   return (
-    authLoaded &&
-    !currentProfile && (
+    authLoaded && (
       <main className={styles.selectProfilePage}>
         <h1>{"Who's Watching?"}</h1>
         <ul className={styles.profileList}>
-          {profiles.map((profile) => (
+          {user?.profiles.map((profile) => (
             <li
               key={profile.id}
               className={styles.profileCard}
               onClick={() => handleProfileSelection(profile)}
             >
-              <div className={styles.profilePicWrapper}>
+              <button className={styles.profilePicWrapper}>
                 <Image
                   priority
                   width={150}
@@ -56,14 +47,14 @@ export default function SelectProfilePage() {
                   src={`https://api.multiavatar.com/${profile.id}.svg`}
                   alt="User Avatar"
                 />
-              </div>
+              </button>
               <h3>{profile.name}</h3>
             </li>
           ))}
           <li className={styles.profileCard}>
-            <div className={`${styles.profilePicWrapper} ${styles.addProfile}`}>
+            <button className={`${styles.profilePicWrapper} ${styles.addProfile}`}>
               <Icons type="add" />
-            </div>
+            </button>
             <h3>Add Profile</h3>
           </li>
         </ul>

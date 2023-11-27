@@ -7,7 +7,6 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 // INTERNAL
 import useAuth from "@/hooks/useAuth";
-import { Profile } from "@/utils/interfaces";
 import signIn from "@/actions/SignIn.action";
 import FormInput from "../FormInput/FormInput";
 import { EMAIL_VALIDATION } from "@/utils/constants";
@@ -23,7 +22,7 @@ export default function SignInForm() {
   const [pwd, setPwd] = useState<string>("");
   const [errMsg, setErrMsg] = useState<string>("");
 
-  const { loginUser, updateProfileList, persist, persistUser } = useAuth();
+  const { loginUser, persist, persistUser } = useAuth();
 
   // Focus email input on load
   useEffect(() => {
@@ -60,9 +59,7 @@ export default function SignInForm() {
   const onSignIn = async (formData: FormData) => {
     const res = await signIn(formData);
     if (res.ok) {
-      const profiles = res.data.payload as Profile[];
-      loginUser();
-      updateProfileList(profiles);
+      loginUser(res.data.payload!);
       redirect("/profiles/select");
     }
 
