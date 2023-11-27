@@ -1,8 +1,8 @@
 "use server";
 
-import { AuthResponse } from "@/utils/interfaces";
 // INTERNAL
 import * as db from "../utils/db";
+import { AuthResponse } from "@/utils/interfaces";
 
 export default async function signIn(formData: FormData): Promise<AuthResponse> {
   let email = formData.get("email");
