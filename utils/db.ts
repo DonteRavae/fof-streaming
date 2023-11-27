@@ -3,7 +3,7 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 // INTERNAL
 import { generateJWTs, validateRefreshToken } from "./jwt";
-import { AuthResponse, IAuth, IProfile } from "./interfaces";
+import { AuthResponse, IAuth, IProfile, Subscriber } from "./interfaces";
 // EXTERNAL
 import bcrypt from "bcrypt";
 import { ulid } from "ulid";
@@ -38,15 +38,15 @@ async function does_user_exist(email: string): Promise<boolean> {
   return false;
 }
 
-async function find_subscriber_by_email(
-  email: string
-): Promise<IAuth[] | null> {
+async function find_subscriber_by_email(email: string): Promise<IAuth | null> {
   try {
     let [result] = await pool.execute<IAuth[]>(
-      "SELECT id, ref, hash FROM auth WHERE email = ?",
+      "SELECT ref, hash FROM auth WHERE email = ?",
       [email]
     );
-    return result;
+
+    if (result.length < 1) return null;
+    return result[0];
   } catch (error) {
     console.error(error);
     return null;
@@ -88,12 +88,23 @@ export async function register_subscriber(
 
     const profileId = uuidv4();
 
-    await conn.query("INSERT INTO profiles (id, auth_id) VALUES (?, ?)", [
-      profileId,
-      userId,
-    ]);
+    let result = await conn.query(
+      "INSERT INTO profiles (id, auth_id) VALUES (?, ?)",
+      [profileId, userRef]
+    );
 
     await conn.commit();
+
+    let user: Subscriber = {
+      id: userRef,
+      email: email,
+      profiles: [
+        {
+          id: profileId,
+          name: "Me",
+        },
+      ],
+    };
 
     cookies().set({
       name: "ffrt",
@@ -117,12 +128,12 @@ export async function register_subscriber(
       ok: true,
       data: {
         message: "Subscriber created successfully",
-        payload: [{ id: profileId, name: "Me" }],
+        payload: user,
       },
     };
   } catch (error) {
     console.error(error);
-    if (conn) await conn?.rollback();
+    if (conn) await conn.rollback();
   } finally {
     if (conn) conn.release();
   }
@@ -143,8 +154,8 @@ export async function login_subscriber(
   let conn = null;
 
   try {
-    let result = await find_subscriber_by_email(email);
-    if (!result || result.length < 1) {
+    let user = await find_subscriber_by_email(email);
+    if (!user) {
       return {
         ok: false,
         data: {
@@ -153,8 +164,6 @@ export async function login_subscriber(
         },
       };
     }
-
-    let user = result[0];
 
     // If passwords match...
     if (await bcrypt.compare(password, user.hash)) {
@@ -170,12 +179,12 @@ export async function login_subscriber(
 
       let [profiles] = await conn.query<IProfile[]>(
         "SELECT id, name FROM profiles WHERE auth_id = ?",
-        [user.id]
+        [user.ref]
       );
 
       await conn?.commit();
 
-      cookies().set({
+      http: cookies().set({
         name: "ffrt",
         value: tokens.refresh,
         httpOnly: true,
@@ -197,7 +206,11 @@ export async function login_subscriber(
         ok: true,
         data: {
           message: "Successful login",
-          payload: profiles,
+          payload: {
+            id: user.ref,
+            email,
+            profiles,
+          },
         },
       };
     } else {
@@ -249,40 +262,7 @@ export async function logout_subscriber(token: string) {
   }
 }
 
-export async function refresh_profiles_by_id(
-  id: string
-): Promise<[IProfile, IProfile[]] | null> {
-  let conn = null;
-
-  try {
-    conn = await pool.getConnection();
-    await conn.beginTransaction();
-    let [result] = await conn.query<IProfile[]>(
-      "SELECT * FROM profiles WHERE id = ?",
-      [id]
-    );
-    if (result.length > 0) {
-      let currentProfile = result[0];
-      let [profiles] = await conn.query<IProfile[]>(
-        "SELECT id, name FROM profiles WHERE auth_id = ?",
-        [currentProfile.auth_id]
-      );
-      await conn.commit();
-      return [result[0], profiles];
-    }
-  } catch (error) {
-    console.error(error);
-    if (conn) await conn.rollback();
-  } finally {
-    if (conn) conn.release();
-  }
-  return null;
-}
-
-export async function refresh(
-  token: string,
-  pid: string
-): Promise<[IProfile, IProfile[]] | null> {
+export async function refresh(token: string): Promise<Subscriber | null> {
   let conn = null;
 
   try {
@@ -290,7 +270,7 @@ export async function refresh(
     await conn.beginTransaction();
 
     let [result] = await conn.query<IAuth[]>(
-      "SELECT id, ref FROM auth WHERE refresh_token = ?",
+      "SELECT ref, email FROM auth WHERE refresh_token = ?",
       [token]
     );
     if (result.length < 1) return null;
@@ -303,18 +283,11 @@ export async function refresh(
     const tokens = generateJWTs(user.ref);
 
     let [profiles] = await conn.query<IProfile[]>(
-      "SELECT id, name FROM profiles WHERE id = ?",
-      [pid]
+      "SELECT id, name FROM profiles WHERE auth_id = ?",
+      [user.ref]
     );
 
     if (profiles.length < 1) redirect("/access/signin");
-
-    const currentProfile = profiles[0];
-
-    [profiles] = await conn.query<IProfile[]>(
-      "SELECT * FROM profiles WHERE auth_id = ?",
-      user.id
-    );
 
     await conn.commit();
 
@@ -327,9 +300,53 @@ export async function refresh(
       sameSite: "strict",
     });
 
-    return [currentProfile, profiles];
+    return {
+      id: user.ref,
+      email: user.email,
+      profiles,
+    };
   } catch (error) {
     console.log(error);
+    if (conn) await conn.rollback();
+  } finally {
+    if (conn) conn.release();
   }
   return null;
+}
+
+export async function find_subscriber_by_id(
+  id: string
+): Promise<Subscriber | null> {
+  let conn = null;
+  try {
+    conn = await pool.getConnection();
+    await conn.beginTransaction();
+
+    const [users] = await conn.query<IAuth[]>(
+      "SELECT email FROM auth WHERE ref = ?",
+      [id]
+    );
+
+    if (users.length < 1) return null;
+    let user = users[0];
+
+    const [profiles] = await conn.query<IProfile[]>(
+      "SELECT id, name FROM profiles WHERE auth_id = ?",
+      [id]
+    );
+
+    await conn.commit();
+
+    return {
+      id,
+      email: user.email,
+      profiles,
+    };
+  } catch (error) {
+    console.error(error);
+    if (conn) await conn.rollback();
+    return null;
+  } finally {
+    if (conn) conn.release();
+  }
 }
