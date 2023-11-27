@@ -6,34 +6,32 @@ import { ReactNode, createContext, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 // INTERNAL
 import checkAuth from "@/actions/CheckAuth";
-import { Profile } from "@/utils/interfaces";
+import { Profile, Subscriber } from "@/utils/interfaces";
 
 type AuthContextState = {
+  user: Subscriber | null;
   loggedIn: boolean;
-  profiles: Profile[];
   persist: boolean;
   authLoaded: boolean;
-  persistProfile: string;
+  persistedProfile: string;
   currentProfile: Profile | null;
-  loginUser(): void;
+  loginUser(user: Subscriber): void;
   logoutUser(): void;
   selectProfile(profile: Profile | null): void;
-  updateProfileList(profiles: Profile[]): void;
   persistUser(value: boolean): void;
   persistUserProfile(id: string): void;
 };
 
 const INITIAL_CONTEXT: AuthContextState = {
+  user: null,
   loggedIn: false,
-  profiles: [],
   persist: false,
   authLoaded: false,
-  persistProfile: "",
+  persistedProfile: "",
   currentProfile: null,
-  loginUser: () => {},
+  loginUser: (user: Subscriber) => {},
   logoutUser: () => {},
   selectProfile: (profile: Profile | null) => {},
-  updateProfileList: (profiles: Profile[]) => {},
   persistUser: (value: boolean) => {},
   persistUserProfile: (id: string) => {},
 };
@@ -41,8 +39,8 @@ const INITIAL_CONTEXT: AuthContextState = {
 export const AuthContext = createContext<AuthContextState>(INITIAL_CONTEXT);
 
 export default function AuthProvider({ children }: { children: ReactNode }) {
+  const [user, setUser] = useState<Subscriber | null>(null);
   const [currentProfile, setCurrentProfile] = useState<Profile | null>(null);
-  const [profiles, setProfiles] = useState<Profile[]>([]);
   const [loggedIn, setLoggedIn] = useState<boolean>(false);
   const [authLoaded, setAuthLoaded] = useState<boolean>(false);
   const [persist, setPersist] = useState<boolean>(() => {
@@ -51,7 +49,7 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
       return trustDevice ? JSON.parse(trustDevice) : false;
     }
   });
-  const [persistProfile, setPersistProfile] = useState<string>(() => {
+  const [persistedProfile, setPersistProfile] = useState<string>(() => {
     if (typeof window !== "undefined") {
       let pid = localStorage.getItem("pid");
       return pid ? JSON.parse(pid) : "";
@@ -62,48 +60,53 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     const verifyAuth = async () => {
-      let res = await checkAuth(persistProfile);
-      if (res) {
-        setCurrentProfile(res[0]);
-        setProfiles(res[1]);
-        loginUser();
-        setAuthLoaded(true);
+      let user = await checkAuth();
+      if (user) {
+        let profile = user.profiles.find((p) => p.id === persistedProfile)!;
+        loginUser(user);
+        setCurrentProfile(profile);
       } else {
         logoutUser();
-        setAuthLoaded(true);
+        // TODO: Check if previous route is an access or home route. If so, redirect to previous route, else redirect to home page.
         router.replace("/");
       }
     };
 
-    if (persist && !currentProfile) verifyAuth();
-  }, []);
+    if (persist) verifyAuth();
+    setAuthLoaded(true);
+  }, [currentProfile, persist, persistedProfile, router]);
 
-  const loginUser = () => setLoggedIn(true);
+  const loginUser = (user: Subscriber) => {
+    setUser(user);
+    setLoggedIn(true);
+  };
   const logoutUser = () => {
     setLoggedIn(false);
+    setUser(null);
     setCurrentProfile(null);
     setPersistProfile("");
     localStorage.removeItem("pid");
   };
   const selectProfile = (profile: Profile | null) => setCurrentProfile(profile);
-  const updateProfileList = (profiles: Profile[]) => setProfiles(profiles);
   const persistUser = (value: boolean) => setPersist(value);
-  const persistUserProfile = (id: string) => setPersistProfile(id);
+  const persistUserProfile = (id: string) => {
+    setPersistProfile(id);
+    localStorage.setItem("pid", JSON.stringify(id));
+  };
 
   return (
     <AuthContext.Provider
       value={{
+        user,
         persist,
         loggedIn,
-        profiles,
         authLoaded,
-        persistProfile,
         currentProfile,
+        persistedProfile,
         loginUser,
         logoutUser,
         persistUser,
         selectProfile,
-        updateProfileList,
         persistUserProfile,
       }}
     >
