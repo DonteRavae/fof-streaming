@@ -1,5 +1,6 @@
-import SectionalVideoCardSlider from "@/components/SectionalVideoCardSlider/SectionalVideoCardSlider";
+// INTERNAL
 import Showcase from "@/components/Showcase/Showcase";
+import SectionalVideoCardSlider from "@/components/SectionalVideoCardSlider/SectionalVideoCardSlider";
 
 export default function CatalogOverviewPage() {
   return (
