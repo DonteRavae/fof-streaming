@@ -4,22 +4,15 @@
 import { cookies } from "next/headers";
 // INTERNAL
 import * as db from "@/utils/db";
+import { Subscriber } from "@/utils/interfaces";
 import { validateAccessToken } from "@/utils/jwt";
-import { IProfile } from "@/utils/interfaces";
 
-export default async function checkAuth(
-  pid: string | null
-): Promise<[IProfile, IProfile[]] | null> {
-  const access_cookie = cookies().get("ffat");
-  if (!access_cookie) return null;
+export default async function checkAuth(): Promise<Subscriber | null> {
+  const accessCookie = cookies().get("ffat");
+  const refreshCookie = cookies().get("ffrt");
+  if (!accessCookie || !refreshCookie) return null;
 
-  if (pid) {
-    if (validateAccessToken(access_cookie.value)) {
-      return await db.refresh_profiles_by_id(pid);
-    } else {
-      const refresh_cookie = cookies().get("ffrt");
-      if (!refresh_cookie) return null;
-      return await db.refresh(refresh_cookie.value, pid);
-    }
-  } else return null;
+  const accessTokenClaims = validateAccessToken(accessCookie.value);
+  if (!accessTokenClaims) return await db.refresh(refreshCookie.value);
+  else return await db.find_subscriber_by_id(accessTokenClaims.sub!);
 }
