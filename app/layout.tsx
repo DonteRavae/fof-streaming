@@ -1,3 +1,5 @@
+import React, { ReactNode } from "react";
+
 // NEXT.JS
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
@@ -16,6 +18,15 @@ export const metadata: Metadata = {
   robots: "index, follow",
 };
 
+const RootChildren = React.memo(({ children }: { children: ReactNode }) => (
+  <>
+    <ApplicationHeader />
+    {children}
+  </>
+));
+
+RootChildren.displayName = "Root Children";
+
 export default function RootLayout({
   children,
 }: {
@@ -25,8 +36,7 @@ export default function RootLayout({
     <html lang="en">
       <body className={inter.className}>
         <AuthProvider>
-          <ApplicationHeader />
-          {children}
+          <RootChildren>{children}</RootChildren>
         </AuthProvider>
       </body>
     </html>
