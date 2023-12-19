@@ -1,0 +1,30 @@
+.details {
+    height: 1.5em; 
+    display: flex;
+    align-items: center;
+    gap: 0.5em;
+    margin: 1em 0;
+    letter-spacing: 0.05em;
+
+    &.password {
+        letter-spacing: 0.2em;
+    }
+}
+
+.forgotPasswordLink {
+    width: 125px;
+    font-size: 0.8em;
+    margin-left: auto;
+    color: red;
+    cursor: pointer;
+
+    &:hover {
+        text-decoration: underline;
+    }
+}
+
+.signOutAllButton {
+    height: 3em;
+    width: 100%;
+    margin-top: 1em;
+}

@@ -1,0 +1,27 @@
+.billingDetails {
+    height: 1.5em;
+    display: flex;
+    align-items: center;
+    gap: 0.5em;
+    margin: 1em 0;
+}
+
+.cancelSubscriptionButton {
+    height: 3em;
+    width: 100%;
+    margin-top: 1em;
+}
+
+.accountDecisionButtons {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    gap: 1em;
+    margin-top: 2em;
+
+    .exitModalButton {
+        flex: 1;
+        height: 3em;
+    }
+
+}
