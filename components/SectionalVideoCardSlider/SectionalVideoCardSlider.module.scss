@@ -12,11 +12,10 @@
         grid-auto-columns: 20%;
         grid-auto-rows: 100%;
         grid-auto-flow: column;
-        padding: 15px 25px;
-        gap: 25px;
+        padding: 0.9em 1.4em;
+        gap: 1.5em;
         overflow-x: auto;
         scrollbar-width: none;
-
         scroll-behavior: smooth;
 
         &::-webkit-scrollbar {

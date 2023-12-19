@@ -13,13 +13,13 @@ export default function SectionalVideoCardSlider({
     <section className={styles.sectionalContainer}>
       <h3 className={styles.label}>{label}</h3>
       <div className={styles.slider}>
-        <VideoCard source="/ShowcaseTestVideo.mp4" />
-        <VideoCard source="/ShowcaseTestVideo2.m4v" />
-        <VideoCard source="/ShowcaseTestVideo.mp4" />
-        <VideoCard source="/ShowcaseTestVideo2.m4v" />
-        <VideoCard source="/ShowcaseTestVideo.mp4" />
-        <VideoCard source="/ShowcaseTestVideo2.m4v" />
-        <VideoCard source="/ShowcaseTestVideo.mp4" />
+        <VideoCard />
+        <VideoCard />
+        <VideoCard />
+        <VideoCard />
+        <VideoCard />
+        <VideoCard />
+        <VideoCard />
       </div>
     </section>
   );
