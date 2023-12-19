@@ -4,7 +4,7 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 // INTERNAL
 import useAuth from "@/hooks/useAuth";
-import signOut from "@/actions/SignOut";
+import signOut from "@/actions/SignOut.action";
 import { Icons } from "@/components/Icons";
 // STYLES
 import styles from "./AccountNavigation.module.scss";
@@ -13,10 +13,9 @@ export default function AccountNavigation() {
   const router = useRouter();
   const { currentProfile, logoutUser, user } = useAuth();
 
-  const onSignOut = () => {
-    signOut();
+  const onSignOut = async () => {
+    await signOut();
     logoutUser();
-    router.replace("/");
   };
 
   return (
@@ -33,9 +32,9 @@ export default function AccountNavigation() {
         />
         <section className={styles.dropdown}>
           <menu className={styles.navDropdown}>
-            <li>
-              <Link href="/account">My Account</Link>
-            </li>
+            <Link className={styles.navDropdownLink} href="/account">
+              <li>My Account</li>
+            </Link>
             <li className={styles.manageProfiles}>
               <span>Profiles</span>
               <ul className={styles.profilesDropdown}>
@@ -44,19 +43,23 @@ export default function AccountNavigation() {
                   .map((profile) => (
                     <li key={profile.id}>{profile.name}</li>
                   ))}
-                <li>
-                  <Icons type="add-circle" />
-                  <Link href="/profiles/new">Add Profile</Link>
-                </li>
-                <li>
-                  <Icons type="edit-light" />
-                  <Link href="/profiles/edit">Manage Profiles</Link>
-                </li>
+                <Link className={styles.navDropdownLink} href="/profiles/new">
+                  <li>
+                    <Icons type="add-circle" />
+                    Add Profile
+                  </li>
+                </Link>
+                <Link className={styles.navDropdownLink} href="/profiles/edit">
+                  <li>
+                    <Icons type="edit-light" />
+                    Manage Profiles
+                  </li>
+                </Link>
               </ul>
             </li>
-            <li>
-              <Link href={"/help"}>Help</Link>
-            </li>
+            <Link className={styles.navDropdownLink} href={"/help"}>
+              <li>Help</li>
+            </Link>
             <li className={styles.signOutButtonContainer}>
               <button className={styles.signOutButton} onClick={onSignOut}>
                 Sign Out
