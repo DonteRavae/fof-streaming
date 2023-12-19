@@ -17,8 +17,14 @@ CREATE TABLE profiles (
 
 CREATE TABLE stripe (
     id VARCHAR(255) NOT NULL PRIMARY KEY,
-    customer_id VARCHAR(50) NOT NULL UNIQUE,
-    status ENUM('active', 'paused', 'trialing', 'incomplete', 'past_due', 'unpaid', 'canceled', 'incomplete_expired'),
-    auth_id VARCHAR(255) NOT NULL,
-    FOREIGN KEY (auth_id) REFERENCES auth(ref) ON UPDATE CASCADE
+    customer_id VARCHAR(50) UNIQUE,
+    subscription_id VARCHAR(100) UNIQUE,
+    billing_interval ENUM('month', 'year'),
+    next_billing_date BIGINT,
+    subscription_start_date BIGINT,
+    payment_method_brand VARCHAR(10),
+    payment_method_last_four SMALLINT,
+    status ENUM('created', 'active', 'paused', 'trialing', 'incomplete', 'past_due', 'unpaid', 'canceled', 'incomplete_expired') DEFAULT 'created',
+    auth_id VARCHAR(255),
+    FOREIGN KEY (auth_id) REFERENCES auth(ref) ON UPDATE CASCADE ON DELETE SET NULL
 );
