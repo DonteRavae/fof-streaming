@@ -1,29 +1,21 @@
 "use client";
 
 // REACT
-import {
-  ChangeEventHandler,
-  useContext,
-  useEffect,
-  useRef,
-  useState,
-} from "react";
+import { ChangeEventHandler, useEffect, useRef, useState } from "react";
 // NEXTJS
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { redirect } from "next/navigation";
 // INTERNAL
 import useAuth from "@/hooks/useAuth";
 import { Icons } from "../Icons/index";
 import signUp from "@/actions/SignUp.action";
 import FormInput from "../FormInput/FormInput";
-import SubmitButton from "../SubmitButton/SubmitButton";
 import { EMAIL_VALIDATION, PWD_VALIDATION } from "@/utils/constants";
+import CallToActionButton from "../CallToActionButton/CallToActionButton";
 // STYLES
 import styles from "./index.module.scss";
 
 export default function SignUpForm() {
-  const router = useRouter();
-
   const emailRef = useRef<HTMLInputElement | null>(null);
   const errorRef = useRef<HTMLParagraphElement | null>(null);
   const [errMsg, setErrMsg] = useState<string>("");
@@ -115,11 +107,10 @@ export default function SignUpForm() {
     if (res.ok) {
       let user = res.data.payload!;
       const defaultProfile = user.profiles[0].id;
-      console.log(defaultProfile);
       loginUser(user);
       selectProfile(user.profiles[0]);
       persist && persistUserProfile(defaultProfile);
-      router.replace("/access/signup/checkout");
+      return redirect("/access/signup/checkout");
     }
     setErrMsg(res.data.message as string);
   };
@@ -234,11 +225,9 @@ export default function SignUpForm() {
         handleChange={togglePersist}
       />
 
-      <SubmitButton
-        className={styles.submitFormCTA}
-        disabled={!validEmail || !validPwd || !validMatch}
-        label="Register"
-      />
+      <CallToActionButton className={styles.submitFormButton} disabled={!validEmail || !validPwd || !validMatch}>
+        Register
+      </CallToActionButton>
 
       <footer>
         <p>

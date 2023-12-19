@@ -10,7 +10,7 @@ import useAuth from "@/hooks/useAuth";
 import signIn from "@/actions/SignIn.action";
 import FormInput from "../FormInput/FormInput";
 import { EMAIL_VALIDATION } from "@/utils/constants";
-import SubmitButton from "../SubmitButton/SubmitButton";
+import CallToActionButton from "../CallToActionButton/CallToActionButton";
 // STYLES
 import styles from "./index.module.scss";
 
@@ -60,7 +60,7 @@ export default function SignInForm() {
     const res = await signIn(formData);
     if (res.ok) {
       loginUser(res.data.payload!);
-      redirect("/profiles/select");
+      return redirect("/profiles/select");
     }
 
     setErrMsg(res.data.message as string);
@@ -120,11 +120,12 @@ export default function SignInForm() {
         handleChange={togglePersist}
       />
 
-      <SubmitButton
-        className={styles.submitFormCTA}
+      <CallToActionButton
+        className={styles.submitFormButton}
         disabled={!EMAIL_VALIDATION.test(email) || !pwd}
-        label="Sign In"
-      />
+      >
+        Sign In
+      </CallToActionButton>
 
       <footer>
         <Link className={styles.forgotPassword} href="/help/forgot-password">
