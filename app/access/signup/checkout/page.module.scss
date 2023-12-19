@@ -1,0 +1,51 @@
+.subsciptionCheckoutPage {
+    min-height: calc(100vh - 60px);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    text-align: center;
+    padding: 0.75em;
+
+    .steps {
+        max-width: 400px;
+        display: block;
+        margin: 10em auto 2.5em;
+
+        h5 {
+            margin-bottom: 1em;
+        }
+
+        h2 {
+            font-size: 1.8em;
+            margin-bottom: 0.3em;
+        }
+
+        h3 {
+            margin-bottom: 0.5em;
+            font-size: 1.3em;
+        }
+
+    }
+
+    section {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: auto;
+        gap: 5em;
+    }
+}
+
+/* Mobile */
+@media (max-width: 700px) {
+    .selectPlanPage {
+        .steps {
+            margin: auto;
+        }
+
+        section {
+            gap: 2em;
+            flex-direction: column;
+        }
+    }
+}
