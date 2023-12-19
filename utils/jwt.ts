@@ -1,56 +1,75 @@
 // EXTERNAL
-import jwt, { JwtPayload } from "jsonwebtoken";
+// import jwt, { JwtPayload } from "jsonwebtoken";
+import { JWTPayload, jwtVerify, SignJWT } from "jose";
 
-const accessSecret = process.env.ACCESS_TOKEN_SECRET;
-const refreshSecret = process.env.REFRESH_TOKEN_SECRET;
-const originUrl = process.env.JWT_ORIGIN_URL;
+const accessSecret = process.env.ACCESS_TOKEN_SECRET!;
+const refreshSecret = process.env.REFRESH_TOKEN_SECRET!;
+const originUrl = process.env.JWT_ORIGIN_URL!;
 
-export function generateJWTs(userId: string) {
-  if (!accessSecret || !refreshSecret || !originUrl)
-    return { success: false, access: "", refresh: "" };
+export type GenerateTokensResponse = {
+  access: string;
+  refresh: string;
+};
 
-  const access = jwt.sign({}, accessSecret, {
-    expiresIn: "15m",
-    audience: originUrl,
-    issuer: originUrl,
-    subject: userId,
-  });
-  const refresh = jwt.sign({}, refreshSecret, {
-    expiresIn: "14 days",
-    audience: originUrl,
-    issuer: originUrl,
-    subject: userId,
-  });
+export async function generateJWTs(
+  userId: string,
+  status: string
+): Promise<GenerateTokensResponse> {
+  const iat = Date.now();
+  const fifteenMinutes = iat + 3600 * 250;
+  const twoWeeks = iat + 3600 * 1000 * 24 * 14;
 
-  return { success: true, access, refresh };
+  const access = await new SignJWT({ status })
+    .setProtectedHeader({ alg: "HS256" })
+    .setIssuedAt(Date.now())
+    .setExpirationTime(fifteenMinutes)
+    .setAudience(originUrl)
+    .setIssuer(originUrl)
+    .setSubject(userId)
+    .sign(new TextEncoder().encode(accessSecret));
+
+  const refresh = await new SignJWT({})
+    .setProtectedHeader({ alg: "HS256" })
+    .setIssuedAt(Date.now())
+    .setExpirationTime(twoWeeks)
+    .setAudience(originUrl)
+    .setIssuer(originUrl)
+    .setSubject(userId)
+    .sign(new TextEncoder().encode(refreshSecret));
+
+  return { access, refresh };
 }
 
-export function validateAccessToken(token: string): JwtPayload | null {
+export async function validateAccessToken(
+  token: string
+): Promise<JWTPayload | null> {
   if (!accessSecret || !originUrl) return null;
 
   try {
-    let claims = jwt.verify(token, accessSecret, {
-      audience: originUrl,
-      issuer: originUrl,
-    }) as JwtPayload;
-
-    return claims;
-  } catch (err) {
+    const { payload } = await jwtVerify(
+      token,
+      new TextEncoder().encode(accessSecret)
+    );
+    return payload;
+  } catch (error) {
+    console.error(error);
     return null;
   }
 }
 
-export function validateRefreshToken(token: string): JwtPayload | null {
+export async function validateRefreshToken(
+  token: string
+): Promise<JWTPayload | null> {
   if (!refreshSecret || !originUrl) return null;
 
   try {
-    let claims = jwt.verify(token, refreshSecret, {
-      audience: originUrl,
-      issuer: originUrl,
-    }) as JwtPayload;
-
-    return  claims;
-  } catch (err) {
+    const { payload } = await jwtVerify(
+      token,
+      new TextEncoder().encode(accessSecret)
+    );
+    return payload;
+  } catch (error) {
+    console.error(error);
     return null;
   }
 }
