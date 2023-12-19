@@ -1,0 +1,21 @@
+.modal {
+    min-width: 400px;
+    max-width: 30vw;
+    margin: auto;
+    display: none;
+    border-radius: 0.3em;
+
+
+    &::backdrop {
+        background: rgba(0, 0, 0, 0.2);
+        backdrop-filter: blur(0.1em);
+    }
+}
+
+.modal[open] {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    justify-content: center;
+    padding: 2.5em;
+}
