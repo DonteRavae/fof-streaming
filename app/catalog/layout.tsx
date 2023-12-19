@@ -1,3 +1,4 @@
+// REACT
 import { ReactNode } from "react";
 // STYLES
 import styles from "./page.module.scss";
