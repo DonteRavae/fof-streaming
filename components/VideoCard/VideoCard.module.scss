@@ -1,19 +1,15 @@
 .container {
-    height: 100%;
-    border-radius: 5px;
+    min-height: 150px;
+    border-radius: 10px;
     transition: 300ms ease all;
     overflow: hidden;
     cursor: pointer;
-    box-shadow: 0 1px 10px 3px rgba(0, 0, 0, 0.3);
     position: relative;
-
-    video {
-        height: 100%;
-        width: 100%;
-        object-fit: cover;
-        object-position: top center;
-    }
-
+    transition: 300ms ease-out all;
+    outline-offset: 3px;
+    outline: 3px solid transparent;
+    box-shadow: 4px 4px 10px 3px rgba(0, 0, 0, 0.3);
+    
     .poster {
         position: absolute;
         visibility: visible;
@@ -22,46 +18,9 @@
         opacity: 1;
     }
 
-    .volumeToggle {
-        height: 3em;
-        width: 3em;
-        border: 2px solid rgba(255, 255, 255, 0.3);
-        position: absolute;
-        padding-top: 3px;
-        z-index: 3;
-        bottom: 3%;
-        background: none;
-        right: 2%;
-        border-radius: 50%;
-        cursor: pointer;
-        transition: 100ms ease all;
-
-
-        &:hover {
-            border: 2px solid white;
-            box-shadow: 0 0 5px 3px rgba(255, 255, 255, 0.3);
-
-            &~.poster {
-                opacity: 0;
-                visibility: hidden;
-            }
-        }
-    }
-
-    &.revealShowcaseVideo>.poster {
-        transition: 300ms 1s ease all;
-        opacity: 0;
-        visibility: hidden;
-    }
-
-    &.revealVideo {
+    &:hover {
         transform: scale(1.05);
-        box-shadow: 0 1px 10px 1px rgba(255, 255, 255, 0.3);
-
-        .poster {
-            opacity: 0;
-            visibility: hidden;
-        }
+        outline: 3px solid white;
     }
 }
 
