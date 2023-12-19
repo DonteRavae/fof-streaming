@@ -1,3 +1,5 @@
+@use "../utils/styles.scss" as styles;
+
 .main {
   display: flex;
   flex-direction: column;
@@ -43,22 +45,6 @@
         font-weight: bolder;
         margin-bottom: 1.5em;
         text-shadow: 0 4px 4px rgba(0, 0, 0, 0.7);
-      }
-    }
-
-    .signUpBtn {
-      min-width: 200px;
-      background: rgb(173, 162, 56); // Secondary
-      background: rgb(97, 154, 50); // Third
-      font-size: 1.1em;
-      padding: 8px 20px;
-      border-radius: 5px;
-      cursor: pointer;
-      text-align: center;
-
-      &:hover {
-        background: rgb(130, 120, 20); // Secondary tinted
-        background: rgb(62, 116, 18); // Third tinted
       }
     }
   }

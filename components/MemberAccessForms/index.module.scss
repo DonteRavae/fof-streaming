@@ -1,3 +1,5 @@
+@use "../../utils/styles.scss" as styles;
+
 @mixin shrink-label {
   top: -24px;
   left: 0;
@@ -41,6 +43,7 @@
     .signUpLink {
       background: none;
       color: white;
+
       a {
         color: rgb(173, 162, 56);
       }
@@ -96,7 +99,7 @@
     outline: none;
   }
 
-  &:focus ~ .formLabels {
+  &:focus~.formLabels {
     @include shrink-label;
   }
 }
@@ -144,6 +147,7 @@
     margin-right: 0.3em;
     margin-top: auto;
     margin-bottom: auto;
+
     path {
       fill: white;
     }
@@ -153,6 +157,7 @@
 .trustDeviceInputContainer {
   width: 100%;
   color: white;
+  margin-bottom: 30px;
 }
 
 .trustDeviceLabel {
@@ -160,20 +165,8 @@
   font-size: 0.9em;
 }
 
-.submitFormCTA {
+.submitFormButton {
   width: 100%;
-  height: 50px;
-  margin: 30px auto 0;
-  padding: 5px auto;
-  font-size: 16px;
-  background: rgb(97, 154, 50); // Third
-  color: white;
-  cursor: pointer;
-
-  &:disabled {
-    cursor: not-allowed;
-    background: rgb(62, 116, 18); // Third tinted
-  }
 }
 
 .offscreen {
