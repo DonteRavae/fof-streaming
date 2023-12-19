@@ -10,12 +10,7 @@
   position: sticky;
   top: 0;
   z-index: 999;
-  
-  &.sticky {
-      background: rgba(0, 0, 0, 0.9);
-    // background: rgb(59, 0, 59);
-    box-shadow: 0 1px 3px rgba(255, 255, 255, 0.3);
-  }
+  background: linear-gradient(black, transparent);
 
   nav {
     animation: fadeInAnimation ease 0.7s;
@@ -49,7 +44,8 @@
     display: flex;
     align-items: center;
     justify-content: space-evenly;
-    font-weight: lighter;
+    font-weight: 500;
+    color: #EFEDEE;
 
 
     menu {

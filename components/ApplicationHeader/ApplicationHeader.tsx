@@ -38,35 +38,42 @@ export default function ApplicationHeader() {
     <header
       className={`${styles.applicationHeader} ${sticky ? styles.sticky : ""}`}
     >
-      <Link href={`${loggedIn ? "/catalog" : "/"}`}>
-        <h2 className={nixie.className}>Force of Faith</h2>
-      </Link>
+      {path !== "/profiles/select" && (
+        <Link href={`${loggedIn ? "/catalog" : "/"}`}>
+          <h2 className={nixie.className}>Force of Faith</h2>
+        </Link>
+      )}
       {authLoaded && (
         <>
-          {loggedIn && !path.startsWith("/profiles") && (
-            <nav className={styles.applicationNav}>
-              <menu>
-                <li>
-                  <Link href="/catalog/sermons">Sermons</Link>
-                </li>
-                <li>
-                  <Link href="/catalog/podcasts">Podcasts</Link>
-                </li>
-                <li>
-                  <Link href="/catalog/testimonials">Testimonials</Link>
-                </li>
-                <li>
-                  <Link href="/watchlist">My List</Link>
-                </li>
-              </menu>
-            </nav>
-          )}
+          {loggedIn &&
+            !path.startsWith("/profiles") &&
+            !path.startsWith("/access") && (
+              <nav className={styles.applicationNav}>
+                <menu>
+                  <li>
+                    <Link href="/catalog/sermons">Sermons</Link>
+                  </li>
+                  <li>
+                    <Link href="/catalog/podcasts">Podcasts</Link>
+                  </li>
+                  <li>
+                    <Link href="/catalog/testimonials">Testimonials</Link>
+                  </li>
+                  <li>
+                    <Link href="/watchlist">My List</Link>
+                  </li>
+                </menu>
+              </nav>
+            )}
           {/* ADD SEARCHBAR */}
           {loggedIn && !path.startsWith("/profiles") && <AccountNavigation />}
           {!loggedIn &&
             path !== "/access/signin" &&
             path !== "/access/signup/checkout" &&
-            !path.startsWith("/catalog") && <AccessNavigation />}
+            !path.startsWith("/catalog") && <AccessNavigation signIn />}
+          {loggedIn && path === "/access/signup/checkout" && (
+            <AccessNavigation signOut />
+          )}
         </>
       )}
     </header>
