@@ -3,3 +3,16 @@
   padding: 0;
   color: white;
 }
+
+.catalogOverviewPage {
+  display: flex;
+  flex-direction: column;
+  gap: 2em;
+}
+
+.catalogGrid {
+  padding-top: 60vh;
+  display: grid;
+  grid-auto-flow: row;
+  gap: 2.5em;
+}

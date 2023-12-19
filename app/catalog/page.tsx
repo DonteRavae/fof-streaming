@@ -1,14 +1,18 @@
 // INTERNAL
 import Showcase from "@/components/Showcase/Showcase";
 import SectionalVideoCardSlider from "@/components/SectionalVideoCardSlider/SectionalVideoCardSlider";
+// STYLES
+import styles from "./page.module.scss";
 
 export default function CatalogOverviewPage() {
   return (
-    <main>
+    <main className={styles.catalogOverviewPage}>
       <Showcase />
-      <SectionalVideoCardSlider label="Continue Watching" />
-      <SectionalVideoCardSlider label="New on Force of Faith" />
-      <SectionalVideoCardSlider label="Trending Now" />
+      <section className={styles.catalogGrid}>
+        <SectionalVideoCardSlider label="Continue Watching" />
+        <SectionalVideoCardSlider label="New on Force of Faith" />
+        <SectionalVideoCardSlider label="Trending Now" />
+      </section>
     </main>
   );
 }
