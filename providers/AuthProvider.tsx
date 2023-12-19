@@ -1,12 +1,12 @@
 "use client";
 
 // REACT
-import { ReactNode, createContext, useEffect, useState } from "react";
+import { ReactNode, createContext, useEffect, useMemo, useState } from "react";
 // NEXT.JS
 import { useRouter } from "next/navigation";
 // INTERNAL
-import checkAuth from "@/actions/CheckAuth";
-import { Profile, Subscriber } from "@/utils/interfaces";
+import checkAuthentication from "@/actions/CheckAuth.action";
+import { Profile, STRIPE_STATUS, Subscriber } from "@/utils/interfaces";
 
 type AuthContextState = {
   user: Subscriber | null;
@@ -59,23 +59,27 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
   const router = useRouter();
 
   useEffect(() => {
+    const login = (user: Subscriber) => {
+      let profile = user.profiles.find((p) => p.id === persistedProfile)!;
+      loginUser(user);
+      setCurrentProfile(profile);
+    };
+
     const verifyAuth = async () => {
-      let user = await checkAuth();
+      let user = await checkAuthentication();
       if (user) {
-        let profile = user.profiles.find((p) => p.id === persistedProfile)!;
-        loginUser(user);
-        setCurrentProfile(profile);
+        login(user);
       } else {
         logoutUser();
-        // TODO: Check if previous route is an access or home route. If so, redirect to previous route, else redirect to home page.
-        router.replace("/");
+        return router.replace("/");
       }
     };
 
     if (persist) verifyAuth();
     setAuthLoaded(true);
-  }, [currentProfile, persist, persistedProfile, router]);
+  }, [persist, persistedProfile, router, loggedIn, user?.status]);
 
+  // HANDLERS
   const loginUser = (user: Subscriber) => {
     setUser(user);
     setLoggedIn(true);
@@ -94,23 +98,24 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
     localStorage.setItem("pid", JSON.stringify(id));
   };
 
+  const contextValue = useMemo(
+    () => ({
+      user,
+      persist,
+      loggedIn,
+      authLoaded,
+      currentProfile,
+      persistedProfile,
+      loginUser,
+      logoutUser,
+      persistUser,
+      selectProfile,
+      persistUserProfile,
+    }),
+    [user, persist, loggedIn, authLoaded, currentProfile, persistedProfile]
+  );
+
   return (
-    <AuthContext.Provider
-      value={{
-        user,
-        persist,
-        loggedIn,
-        authLoaded,
-        currentProfile,
-        persistedProfile,
-        loginUser,
-        logoutUser,
-        persistUser,
-        selectProfile,
-        persistUserProfile,
-      }}
-    >
-      {children}
-    </AuthContext.Provider>
+    <AuthContext.Provider value={contextValue}>{children}</AuthContext.Provider>
   );
 }
