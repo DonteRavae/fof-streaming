@@ -3,7 +3,14 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 // INTERNAL
 import { generateJWTs, validateRefreshToken } from "./jwt";
-import { AuthResponse, IAuth, IProfile, Subscriber } from "./interfaces";
+import {
+  AuthResponse,
+  IAuth,
+  IProfile,
+  IStripeDetails,
+  STRIPE_STATUS,
+  Subscriber,
+} from "./interfaces";
 // EXTERNAL
 import bcrypt from "bcrypt";
 import { ulid } from "ulid";
@@ -22,26 +29,10 @@ const pool = mysql.createPool({
 export default pool;
 
 // HELPERS
-
-async function does_user_exist(email: string): Promise<boolean> {
-  try {
-    let [result] = await pool.execute<IAuth[]>(
-      "SELECT id FROM auth WHERE email = ?",
-      [email]
-    );
-
-    if (result.length) return true;
-  } catch (error) {
-    console.error(error);
-  }
-
-  return false;
-}
-
 async function find_subscriber_by_email(email: string): Promise<IAuth | null> {
   try {
-    let [result] = await pool.execute<IAuth[]>(
-      "SELECT ref, hash FROM auth WHERE email = ?",
+    let [result] = await pool.query<IAuth[]>(
+      "SELECT auth.ref as ref, auth.hash as hash, stripe.status as status FROM auth LEFT JOIN stripe ON auth.ref = stripe.auth_id WHERE email = ?",
       [email]
     );
 
@@ -54,14 +45,13 @@ async function find_subscriber_by_email(email: string): Promise<IAuth | null> {
 }
 
 // HANDLERS
-
 export async function register_subscriber(
   email: string,
   password: string
 ): Promise<AuthResponse> {
   let conn = null;
 
-  const existingUser = await does_user_exist(email);
+  const existingUser = await find_subscriber_by_email(email);
   if (existingUser) {
     return {
       ok: false,
@@ -76,22 +66,30 @@ export async function register_subscriber(
     const userId = uuidv4();
     const userRef = ulid();
     const pwHash = await bcrypt.hash(password, 15);
-    const tokens = generateJWTs(userRef);
+    const tokens = await generateJWTs(userRef, STRIPE_STATUS.CREATED);
 
     conn = await pool.getConnection();
     await conn.beginTransaction();
 
+    // Create Auth object
     await conn.query(
       "INSERT INTO auth (id, ref, email, hash, refresh_token) VALUES (?, ?, ?, ?, ?)",
       [userId, userRef, email, pwHash, tokens.refresh]
     );
 
+    // Create Profile object
     const profileId = uuidv4();
+    await conn.query("INSERT INTO profiles (id, auth_id) VALUES (?, ?)", [
+      profileId,
+      userRef,
+    ]);
 
-    let result = await conn.query(
-      "INSERT INTO profiles (id, auth_id) VALUES (?, ?)",
-      [profileId, userRef]
-    );
+    // Create Stripe object
+    const stripeId = uuidv4();
+    await conn.query("INSERT INTO stripe (id, auth_id) VALUES (?, ?)", [
+      stripeId,
+      userRef,
+    ]);
 
     await conn.commit();
 
@@ -104,6 +102,7 @@ export async function register_subscriber(
           name: "Me",
         },
       ],
+      status: STRIPE_STATUS.CREATED,
     };
 
     cookies().set({
@@ -111,7 +110,7 @@ export async function register_subscriber(
       value: tokens.refresh,
       httpOnly: true,
       secure: true,
-      maxAge: 60 * 60 * 24,
+      maxAge: 60 * 60 * 24, // 1 Day
       sameSite: "strict",
     });
 
@@ -120,7 +119,7 @@ export async function register_subscriber(
       value: tokens.access,
       httpOnly: true,
       secure: true,
-      maxAge: 60 * 60 * 24 * 14,
+      maxAge: 60 * 20,
       sameSite: "strict",
     });
 
@@ -167,7 +166,7 @@ export async function login_subscriber(
 
     // If passwords match...
     if (await bcrypt.compare(password, user.hash)) {
-      const tokens = generateJWTs(user.ref);
+      const tokens = await generateJWTs(user.ref, user.status);
 
       conn = await pool.getConnection();
       await conn.beginTransaction();
@@ -182,9 +181,9 @@ export async function login_subscriber(
         [user.ref]
       );
 
-      await conn?.commit();
+      await conn.commit();
 
-      http: cookies().set({
+      cookies().set({
         name: "ffrt",
         value: tokens.refresh,
         httpOnly: true,
@@ -198,7 +197,7 @@ export async function login_subscriber(
         value: tokens.access,
         httpOnly: true,
         secure: true,
-        maxAge: 60 * 60 * 24 * 14,
+        maxAge: 60 * 20,
         sameSite: "strict",
       });
 
@@ -210,6 +209,7 @@ export async function login_subscriber(
             id: user.ref,
             email,
             profiles,
+            status: user.status,
           },
         },
       };
@@ -240,13 +240,13 @@ export async function login_subscriber(
 export async function logout_subscriber(token: string) {
   try {
     // Is refresh token in database
-    let [result] = await pool.execute<IAuth[]>(
+    let [result] = await pool.query<IAuth[]>(
       "SELECT ref FROM auth WHERE refresh_token = ?",
       [token]
     );
     if (result.length < 1) return;
     // Delete refresh token from database
-    await pool.execute(
+    await pool.query(
       "UPDATE auth SET refresh_token = ? WHERE refresh_token = ?",
       ["", token]
     );
@@ -270,24 +270,24 @@ export async function refresh(token: string): Promise<Subscriber | null> {
     await conn.beginTransaction();
 
     let [result] = await conn.query<IAuth[]>(
-      "SELECT ref, email FROM auth WHERE refresh_token = ?",
+      "SELECT auth.ref as ref, auth.email as email, stripe.status as status FROM auth LEFT JOIN stripe ON auth.ref = stripe.auth_id WHERE refresh_token = ?",
       [token]
     );
     if (result.length < 1) return null;
 
-    let claims = validateRefreshToken(token);
+    let claims = await validateRefreshToken(token);
     if (!claims) return null;
 
     let user = result[0];
     if (user.ref !== claims.sub) return null;
-    const tokens = generateJWTs(user.ref);
+    const tokens = await generateJWTs(user.ref, user.status);
 
     let [profiles] = await conn.query<IProfile[]>(
       "SELECT id, name FROM profiles WHERE auth_id = ?",
       [user.ref]
     );
 
-    if (profiles.length < 1) redirect("/access/signin");
+    if (profiles.length < 1) redirect("/profiles/edit");
 
     await conn.commit();
 
@@ -296,7 +296,7 @@ export async function refresh(token: string): Promise<Subscriber | null> {
       value: tokens.access,
       httpOnly: true,
       secure: true,
-      maxAge: 60 * 60 * 24 * 14,
+      maxAge: 60 * 20,
       sameSite: "strict",
     });
 
@@ -304,6 +304,7 @@ export async function refresh(token: string): Promise<Subscriber | null> {
       id: user.ref,
       email: user.email,
       profiles,
+      status: user.status,
     };
   } catch (error) {
     console.log(error);
@@ -323,7 +324,7 @@ export async function find_subscriber_by_id(
     await conn.beginTransaction();
 
     const [users] = await conn.query<IAuth[]>(
-      "SELECT email FROM auth WHERE ref = ?",
+      "SELECT auth.email as email, stripe.status as status FROM auth LEFT JOIN stripe ON auth.ref = stripe.auth_id WHERE ref = ?",
       [id]
     );
 
@@ -337,10 +338,22 @@ export async function find_subscriber_by_id(
 
     await conn.commit();
 
+    let tokens = await generateJWTs(id, user.status);
+
+    cookies().set({
+      name: "ffat",
+      value: tokens.access,
+      httpOnly: true,
+      secure: true,
+      maxAge: 60 * 15,
+      sameSite: "strict",
+    });
+
     return {
       id,
       email: user.email,
       profiles,
+      status: user.status,
     };
   } catch (error) {
     console.error(error);
@@ -349,4 +362,64 @@ export async function find_subscriber_by_id(
   } finally {
     if (conn) conn.release();
   }
+}
+
+export async function update_user_subscription_status(
+  userEmail: string,
+  customerId: string,
+  subscriptionId: string,
+  status: string // May opt to change status to an enum value
+) {
+  let conn = null;
+
+  try {
+    conn = await pool.getConnection();
+    await conn.beginTransaction();
+
+    const [result] = await conn.query<IAuth[]>(
+      "SELECT ref FROM auth WHERE email = ?",
+      [userEmail]
+    );
+
+    if (result.length < 1) return;
+
+    const user = result[0];
+
+    await conn.query(
+      "UPDATE stripe SET customer_id = ?, subscription_id = ?, status = ? WHERE auth_id = ?",
+      [customerId, subscriptionId, status, user.ref]
+    );
+
+    await conn.commit();
+  } catch (error) {
+    console.error(error);
+    if (conn) await conn.rollback();
+  } finally {
+    if (conn) conn.release();
+  }
+}
+
+export async function getSubscriptionId(userId: string): Promise<string> {
+  const [results] = await pool.query<IStripeDetails[]>(
+    "SELECT subscription_id as subscriptionId FROM stripe WHERE auth_id = ?",
+    [userId]
+  );
+
+  if (results.length < 1) return "";
+
+  const stripeAccount = results[0];
+
+  return stripeAccount.subscriptionId;
+}
+
+export async function getStripeCustomerId(
+  userId: string
+): Promise<string | undefined> {
+  const [results] = await pool.query<IStripeDetails[]>(
+    "SELECT customer_id as customerId FROM stripe WHERE auth_id = ?",
+    [userId]
+  );
+  if (results.length < 1) return;
+
+  return results[0].customerId;
 }
