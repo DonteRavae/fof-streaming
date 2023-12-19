@@ -15,6 +15,6 @@ export default async function signOut() {
 
   await db.logout_subscriber(refreshToken);
 
-  cookies().delete("ffrt");
   cookies().delete("ffat");
+  cookies().delete("ffrt");
 }
