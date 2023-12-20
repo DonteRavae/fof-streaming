@@ -1,5 +1,4 @@
 // EXTERNAL
-// import jwt, { JwtPayload } from "jsonwebtoken";
 import { JWTPayload, jwtVerify, SignJWT } from "jose";
 
 const accessSecret = process.env.ACCESS_TOKEN_SECRET!;
@@ -16,7 +15,7 @@ export async function generateJWTs(
   status: string
 ): Promise<GenerateTokensResponse> {
   const iat = Date.now();
-  const fifteenMinutes = iat + 3600 * 250;
+  const fifteenMinutes = iat + 60 * 1000 * 15; // 1 minute
   const twoWeeks = iat + 3600 * 1000 * 24 * 14;
 
   const access = await new SignJWT({ status })
@@ -48,7 +47,10 @@ export async function validateAccessToken(
   try {
     const { payload } = await jwtVerify(
       token,
-      new TextEncoder().encode(accessSecret)
+      new TextEncoder().encode(accessSecret),
+      {
+        audience: originUrl,
+      }
     );
     return payload;
   } catch (error) {
@@ -65,7 +67,10 @@ export async function validateRefreshToken(
   try {
     const { payload } = await jwtVerify(
       token,
-      new TextEncoder().encode(accessSecret)
+      new TextEncoder().encode(accessSecret),
+      {
+        audience: originUrl,
+      }
     );
     return payload;
   } catch (error) {

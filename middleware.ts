@@ -37,7 +37,9 @@ export default async function middleware(request: NextRequest) {
           path.startsWith("/catalog") ||
           path === "/"
         )
-          return NextResponse.redirect(`${origin}/access/signup/checkout?restart=true`);
+          return NextResponse.redirect(
+            `${origin}/access/signup/checkout?restart=true`
+          );
     }
     return NextResponse.next();
   }
