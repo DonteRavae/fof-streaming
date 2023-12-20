@@ -67,7 +67,7 @@ export async function validateRefreshToken(
   try {
     const { payload } = await jwtVerify(
       token,
-      new TextEncoder().encode(accessSecret),
+      new TextEncoder().encode(refreshSecret),
       {
         audience: originUrl,
       }
