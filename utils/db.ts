@@ -32,7 +32,23 @@ export default pool;
 async function find_subscriber_by_email(email: string): Promise<IAuth | null> {
   try {
     let [result] = await pool.query<IAuth[]>(
-      "SELECT auth.ref as ref, auth.hash as hash, stripe.status as status FROM auth LEFT JOIN stripe ON auth.ref = stripe.auth_id WHERE email = ?",
+      `SELECT 
+        u.ref AS ref, 
+        u.hash AS hash, 
+        JSON_ARRAYAGG(
+          JSON_OBJECT(
+            'id', p.id,
+            'name', p.name
+          )
+        ) AS profiles,
+        s.status AS status 
+      FROM auth AS u 
+      LEFT JOIN stripe AS s 
+      ON (u.ref = s.auth_id) 
+      LEFT JOIN profiles AS p 
+      ON (u.ref = p.auth_id) 
+      WHERE email = ?
+      GROUP BY p.id, s.status`,
       [email]
     );
 
@@ -176,11 +192,6 @@ export async function login_subscriber(
         user.ref,
       ]);
 
-      let [profiles] = await conn.query<IProfile[]>(
-        "SELECT id, name FROM profiles WHERE auth_id = ?",
-        [user.ref]
-      );
-
       await conn.commit();
 
       cookies().set({
@@ -208,7 +219,7 @@ export async function login_subscriber(
           payload: {
             id: user.ref,
             email,
-            profiles,
+            profiles: user.profiles,
             status: user.status,
           },
         },
@@ -270,7 +281,23 @@ export async function refresh(token: string): Promise<Subscriber | null> {
     await conn.beginTransaction();
 
     let [result] = await conn.query<IAuth[]>(
-      "SELECT auth.ref as ref, auth.email as email, stripe.status as status FROM auth LEFT JOIN stripe ON auth.ref = stripe.auth_id WHERE refresh_token = ?",
+      `SELECT 
+        u.ref AS ref, 
+        u.email AS email, 
+        JSON_ARRAYAGG(
+          JSON_OBJECT(
+            'id', p.id,
+            'name', p.name
+          )
+        ) AS profiles,
+        s.status AS status 
+      FROM auth AS u 
+      LEFT JOIN stripe AS s 
+      ON (u.ref = s.auth_id) 
+      LEFT JOIN profiles AS p 
+      ON (u.ref = p.auth_id) 
+      WHERE refresh_token = ?
+      GROUP BY u.ref, p.id, s.status`,
       [token]
     );
     if (result.length < 1) return null;
@@ -324,7 +351,22 @@ export async function find_subscriber_by_id(
     await conn.beginTransaction();
 
     const [users] = await conn.query<IAuth[]>(
-      "SELECT auth.email as email, stripe.status as status FROM auth LEFT JOIN stripe ON auth.ref = stripe.auth_id WHERE ref = ?",
+      `SELECT 
+        u.email AS email, 
+        JSON_ARRAYAGG(
+          JSON_OBJECT(
+            'id', p.id,
+            'name', p.name
+          )
+        ) AS profiles,
+        s.status AS status 
+      FROM auth AS u 
+      LEFT JOIN stripe AS s 
+      ON (u.ref = s.auth_id) 
+      LEFT JOIN profiles AS p 
+      ON (u.ref = p.auth_id) 
+      WHERE ref = ?
+      GROUP BY p.id, s.status`,
       [id]
     );
 
