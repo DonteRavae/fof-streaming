@@ -1,6 +1,4 @@
 .sectionalContainer {
-    width: 100%;
-
     .label {
         padding: 0 25px;
     }
@@ -9,11 +7,11 @@
         width: 100%;
         height: 100%;
         display: grid;
-        grid-auto-columns: 20%;
-        grid-auto-rows: 100%;
+        grid-auto-columns: 18%;
+        grid-auto-rows: calc((18vw * 9) / 16);
         grid-auto-flow: column;
         padding: 0.9em 1.4em;
-        gap: 1.5em;
+        gap: 25px;
         overflow-x: auto;
         scrollbar-width: none;
         scroll-behavior: smooth;
@@ -21,5 +19,27 @@
         &::-webkit-scrollbar {
             display: none;
         }
+    }
+}
+
+/* Tablet and Smaller Desktop */
+@media (min-width: 701px) and (max-width: 1120px) {
+    .sectionalContainer .slider {
+        gap: 15px;
+        grid-auto-columns: 25vw;
+        grid-auto-rows: calc((25vw * 9) / 16);
+    }
+}
+
+/* Mobile */
+@media (max-width: 700px) {
+    .sectionalContainer .slider {
+        gap: 15px;
+        grid-auto-columns: 40vw;
+        grid-auto-rows: calc((40vw * 9) / 16);
+
+
+        // grid-auto-columns: calc((11vh * 16)/9);
+        // grid-auto-rows: 11vh;
     }
 }

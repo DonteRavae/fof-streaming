@@ -5,14 +5,27 @@
 }
 
 .catalogOverviewPage {
+  width: 100%;
   display: flex;
   flex-direction: column;
   gap: 2em;
+  position: relative;
 }
 
 .catalogGrid {
-  padding-top: 60vh;
+  margin-top: min(calc(900vw/16), 70vh); // Will remove max later
   display: grid;
   grid-auto-flow: row;
   gap: 2.5em;
+}
+
+/* Tablet and Smaller Desktop */
+@media (min-width: 701px) and (max-width: 1120px) {}
+
+/* Mobile */
+@media (max-width: 700px) {
+  .catalogGrid {
+    gap: 1em;
+  }
+
 }
