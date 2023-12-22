@@ -35,3 +35,10 @@
         cursor: not-allowed;
     }
 }
+
+/* Smaller Desktop and Below */
+@media (max-width: 1120px) {
+    .ctaButton {
+        font-size: 0.8em;
+    }
+}
