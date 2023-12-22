@@ -6,12 +6,12 @@
   margin-left: auto;
   cursor: pointer;
   position: relative;
+  gap: 20px;
 
   .profilePic {
     height: 45px;
     width: 45px;
     border-radius: 50%;
-    margin-left: 20px;
   }
 
   &:hover>.dropdown {
