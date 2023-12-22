@@ -13,7 +13,7 @@
         padding: 1em 0;
     }
 
-    
+
 
     .profiles {
         list-style: none;
@@ -32,5 +32,21 @@
                 margin-bottom: 0;
             }
         }
+    }
+}
+
+/* Tablet and Smaller Desktop */
+@media (min-width: 701px) and (max-width: 1120px) {
+    .accountDetailsCard .accountDetailsLabel {
+            font-size: 1em;
+            padding: 0.5em 0;
+        }
+}
+
+/* Mobile */
+@media (max-width: 700px) {
+    .accountDetailsCard .accountDetailsLabel {
+        font-size: 1em;
+        padding: 0.5em 0;
     }
 }

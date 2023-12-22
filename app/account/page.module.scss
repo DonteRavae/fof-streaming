@@ -1,7 +1,7 @@
 .accountPage {
     min-height: calc(100vh - 60px);
     display: grid;
-    grid-template-columns: 30vw 30vw;
+    grid-template-columns: 1fr 1fr;
     justify-content: center;
     padding: 10em 1em;
     align-content: start;
@@ -20,6 +20,6 @@
 @media (max-width: 700px) {
     .accountPage {
         grid-template-columns: 1fr;
-        padding-top: 3em;
+        padding-top: 7em;
     }
 }

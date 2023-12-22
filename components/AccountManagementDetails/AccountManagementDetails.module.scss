@@ -1,5 +1,5 @@
 .details {
-    height: 1.5em; 
+    height: 1.5em;
     display: flex;
     align-items: center;
     gap: 0.5em;
@@ -27,4 +27,11 @@
     height: 3em;
     width: 100%;
     margin-top: 1em;
+}
+
+/* Smaller Desktop and Below */
+@media (max-width: 1120px) {
+    .details {
+        font-size: 0.9em;
+    }
 }

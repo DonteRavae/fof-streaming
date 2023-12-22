@@ -25,3 +25,10 @@
     }
 
 }
+
+/* Smaller Desktop and Below */
+@media (max-width: 1120px) {
+    .billingDetails {
+        font-size: 0.9em;
+    }
+}
