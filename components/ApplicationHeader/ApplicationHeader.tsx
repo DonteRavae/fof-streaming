@@ -71,9 +71,9 @@ export default function ApplicationHeader() {
             path !== "/access/signin" &&
             path !== "/access/signup/checkout" &&
             !path.startsWith("/catalog") && <AccessNavigation signIn />}
-          {loggedIn && path === "/access/signup/checkout" && (
-            <AccessNavigation signOut />
-          )}
+          {loggedIn &&
+            (path === "/access/signup/checkout" ||
+              path === "/profiles/select") && <AccessNavigation signOut />}
         </>
       )}
     </header>
