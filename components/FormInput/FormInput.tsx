@@ -5,7 +5,7 @@ import { Icons } from "../Icons";
 // STYLES
 import styles from "./FormInput.module.scss";
 
-interface FormInputProps extends ComponentProps<"input"> {
+export interface FormInputProps extends ComponentProps<"input"> {
   id: string;
   type?: string;
   label?: string;
@@ -38,18 +38,6 @@ export default forwardRef<HTMLInputElement, FormInputProps>(function FormInput(
 ) {
   return (
     <div className={inputContainerClassName}>
-      <input
-        id={id}
-        type={type ? type : "text"}
-        ref={ref}
-        className={inputClassName}
-        aria-invalid={ariaInvalid} // Lets the screen reader know if adjustments are needed before submission
-        aria-describedby={ariaDescribedBy} // Describes the input requirements using the ID of the correlating desription element.
-        onChange={handleChange}
-        onFocus={handleFocus}
-        onBlur={handleExit}
-        {...otherAttrs}
-      />
       {label && (
         <label className={labelClassName} htmlFor={id}>
           {label}
@@ -67,6 +55,18 @@ export default forwardRef<HTMLInputElement, FormInputProps>(function FormInput(
           />
         </label>
       )}
+      <input
+        id={id}
+        type={type ? type : "text"}
+        ref={ref}
+        className={inputClassName}
+        aria-invalid={ariaInvalid} // Lets the screen reader know if adjustments are needed before submission
+        aria-describedby={ariaDescribedBy} // Describes the input requirements using the ID of the correlating desription element.
+        onChange={handleChange}
+        onFocus={handleFocus}
+        onBlur={handleExit}
+        {...otherAttrs}
+      />
     </div>
   );
 });
