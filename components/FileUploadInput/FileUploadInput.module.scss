@@ -1,0 +1,110 @@
+.dropArea {
+    height: calc((480px * 9)/16);
+    width: 480px;
+    border: 2px dashed #ccc;
+    border-radius: 10px;
+    font-family: sans-serif;
+    margin: 100px auto;
+    padding: 20px;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    &.highlight {
+        border-color: purple;
+    }
+
+    .fileUploadIcon {
+        flex: 1;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .instructions {
+        flex: 1;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .divider {
+        flex: 1;
+        width: 80%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        position: relative;
+        display: flex;
+        justify-content: space-around;
+
+        hr {
+            width: 40%;
+        }
+    }
+
+    .chooseFileButton {
+        flex: 1;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 50px;
+        width: 100px;
+        margin: 0 auto;
+        border: none;
+        border-radius: 10px;
+        cursor: pointer;
+        border: 1px solid transparent;
+
+        &:hover {
+            background: none;
+            border: 1px solid #ccc;
+        }
+    }
+
+    .restrictions {
+        flex: 1;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 0.8em;
+    }
+
+    .preview {
+        width: 100%;
+        height: 100%;
+        top: 0;
+        border-radius: 10px;
+        // visibility: hidden;
+        position: absolute;
+    }
+
+    .closeButton {
+        width: 25px;
+        height: 25px;
+        background: transparent;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        border: none;
+        border-radius: 50%;
+        cursor: pointer;
+        z-index: 25;
+        position: absolute;
+        top: 5px;
+        right: 5px;
+
+        svg {
+            margin-bottom: 1px;
+
+            path {
+                fill: white;
+            }
+        }
+
+        &:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+    }
+}
