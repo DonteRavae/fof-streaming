@@ -12,24 +12,32 @@ import {
 import Image from "next/image";
 // INTERNAL
 import { Icons } from "../Icons";
+import uploadFile from "@/actions/UploadFile.action";
 import FormInput, { FormInputProps } from "../FormInput/FormInput";
 // STYLES
 import styles from "./FileUploadInput.module.scss";
 
+interface FileUploadInputProps extends FormInputProps {
+  format: "image" | "video";
+}
+
 export default function FileUploadInput({
   id,
   ref,
+  format,
+  name,
   ...otherProps
-}: FormInputProps) {
+}: FileUploadInputProps) {
   const inputRef = useRef<HTMLInputElement>(null);
   const dropAreaRef = useRef<HTMLDivElement>(null);
-  const previewRef = useRef<HTMLImageElement>(null);
+  const imagePreviewRef = useRef<HTMLImageElement>(null);
+  const videoPreviewRef = useRef<HTMLVideoElement>(null);
   const [highlight, setHighlight] = useState<boolean>(false);
+  const [videoUrl, setVideoUrl] = useState<string>("");
+  const [imageUrl, setImageUrl] = useState<string>("/blank.png");
   const [isPreviewVisible, setIsPreviewVisible] = useState<boolean>(false);
-  const [fileType, setFileType] = useState<string>("");
 
   // DRAG AND DROP HANDLERS
-
   const preventDefaults: DragEventHandler<HTMLDivElement> = (event) => {
     event.preventDefault();
     event.stopPropagation();
@@ -52,20 +60,17 @@ export default function FileUploadInput({
     setHighlight(false);
     const files = event.dataTransfer.files;
     inputRef.current!.files = files;
-    previewFile(files[0]);
-  };
-
-  const previewFile = (file: File) => {
     let reader = new FileReader();
-    reader.readAsDataURL(file);
+    reader.readAsDataURL(files![0]);
     reader.onloadend = function () {
-      console.log(reader.result);
-      previewRef.current!.src = reader.result as string;
+      if (format === "image")
+        imagePreviewRef.current!.src = reader.result as string;
+      else if (format === "video")
+        videoPreviewRef.current!.src = reader.result as string;
     };
-    setIsPreviewVisible(true);
   };
 
-  // CLICK HANDLER
+  // INPUT HANDLERS
   const handleClick: MouseEventHandler = (event) => {
     event.preventDefault();
     event.stopPropagation();
@@ -73,18 +78,39 @@ export default function FileUploadInput({
     inputRef.current!.value = "";
   };
 
-  const handleChange: ChangeEventHandler<HTMLInputElement> = (event) => {
+  const handleChange: ChangeEventHandler<HTMLInputElement> = async (event) => {
     event.preventDefault();
     event.stopPropagation();
-    previewFile(event.currentTarget.files![0]);
+    const file = event.currentTarget.files![0];
+    const formData = new FormData();
+    formData.append("file", file);
+    const [url, filename] = (await uploadFile(formData)) as string[];
+
+    const upload = await fetch(url, {
+      method: "PUT",
+      body: file,
+      headers: { "Content-Type": file.type },
+    });
+
+    if (upload.ok) {
+      console.log("Uploaded successfully!");
+    } else {
+      console.log(upload.status);
+      console.error("Upload failed.");
+    }
+    const s3FileUrl = `${process.env.NEXT_PUBLIC_AWS_S3_FILE_URL}/${filename}`;
+  };
+
+  // HELPERS
+  const previewFile = (fileUrl: string) => {
+    if (format === "image") setImageUrl(fileUrl);
+    else if (format === "video") videoPreviewRef.current!.src = fileUrl;
+    setIsPreviewVisible(true);
   };
 
   const hidePreview = () => {
     setIsPreviewVisible(false);
-    previewRef.current!.src = "";
   };
-
-  // UPLOAD HANDLER
 
   return (
     <div
@@ -115,13 +141,23 @@ export default function FileUploadInput({
         Browse Files
       </button>
       <p className={styles.restrictions}>Maximum file size is 100MB</p>
-      {isPreviewVisible && (
+      {isPreviewVisible && format === "image" && (
         <Image
           className={styles.preview}
-          ref={previewRef}
-          src=""
+          ref={imagePreviewRef}
+          src={imageUrl}
           alt="Poster Preview"
+          fill
         />
+      )}
+      {isPreviewVisible && format === "video" && (
+        <video
+          autoPlay
+          controls
+          src=""
+          className={styles.preview}
+          ref={videoPreviewRef}
+        ></video>
       )}
       <button
         className={styles.closeButton}
