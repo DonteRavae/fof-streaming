@@ -9,6 +9,7 @@ import useAuth from "@/hooks/useAuth";
 import { Profile } from "@/utils/interfaces";
 // STYLES
 import styles from "./ProfileList.module.scss";
+import { redirect } from "next/navigation";
 
 export default function ProfileList() {
   const { user, selectProfile, persistUserProfile } = useAuth();
@@ -16,6 +17,7 @@ export default function ProfileList() {
   const handleProfileSelection = (profile: Profile) => {
     selectProfile(profile);
     persistUserProfile(profile.id);
+    redirect("/catalog");
   };
 
   return (

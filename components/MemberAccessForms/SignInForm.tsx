@@ -60,7 +60,7 @@ export default function SignInForm() {
     const res = await signIn(formData);
     if (res.ok) {
       loginUser(res.data.payload!);
-      return redirect("/profiles/select");
+      redirect("/profiles/select");
     }
 
     setErrMsg(res.data.message as string);
