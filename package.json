@@ -10,6 +10,8 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.478.0",
+    "@aws-sdk/s3-request-presigner": "^3.478.0",
     "@stripe/react-stripe-js": "^2.3.2",
     "@stripe/stripe-js": "^2.1.11",
     "bcrypt": "^5.1.1",
