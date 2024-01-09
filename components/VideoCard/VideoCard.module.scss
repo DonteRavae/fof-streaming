@@ -1,5 +1,4 @@
 .container {
-    min-height: 150px;
     border-radius: 10px;
     transition: 300ms ease all;
     overflow: hidden;
@@ -9,7 +8,7 @@
     outline-offset: 3px;
     outline: 3px solid transparent;
     box-shadow: 4px 4px 10px 3px rgba(0, 0, 0, 0.3);
-    
+
     .poster {
         position: absolute;
         visibility: visible;
@@ -21,6 +20,7 @@
     &:hover {
         transform: scale(1.05);
         outline: 3px solid white;
+        z-index: 15;
     }
 }
 
